@@ -3,10 +3,10 @@ import streamlit as st
 st.set_page_config(page_title="F1 Compatibility App", layout="wide")
 
 
-pages = {
-    "🏠 Home": [st.Page('pages/home.py', title="Home")],
-    "Driver Profile": [st.Page('pages/driverProfile.py', title="Driver Profile")]
-}
+pages = [st.Page('pages/home.py', label = "Home"),
+         st.Page('pages/driverProfile.py', label = 'Driver Profile'),
+         st.Page('pages/compatibilityMatrix.py', label = 'Compatibility Matrix'),
+         st.Page('pages/telemetryExplorer.py', label = 'Telemetry Explorer')]
 
 pg = st.navigation(pages)
 pg.run()
