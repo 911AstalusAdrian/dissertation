@@ -43,4 +43,9 @@ def get_driver(driver_number=None, session_key=None):
     params = {"driver_number":driver_number, "session_key": session_key}
     return fetch_static_data("drivers", params)
 
+def get_last_session() -> str:
+    df = fetch_static_data("sessions")
+    latest_session = df.sort_values("session_key", ascending=False).iloc[0]["session_key"]
+    return str(latest_session)
+
 print(get_driver(driver_number=1, session_key='latest'))
