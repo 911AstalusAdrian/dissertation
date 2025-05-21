@@ -1,39 +1,30 @@
 import streamlit as st
 import pandas as pd
 import numpy as np
-import pydeck as pdk
 
-st.write("Streamlit has lots of fans in the geo community. 🌍 It supports maps from PyDeck, Folium, Kepler.gl, and others.")
+st.write("Got lots of data? Great! Streamlit can show [dataframes](https://docs.streamlit.io/develop/api-reference/data) with hundred thousands of rows, images, sparklines – and even supports editing! ✍️")
 
-chart_data = pd.DataFrame(
-   np.random.randn(1000, 2) / [50, 50] + [37.76, -122.4],
-   columns=['lat', 'lon'])
+num_rows = st.slider("Number of rows", 1, 10000, 500)
+np.random.seed(42)
+data = []
+for i in range(num_rows):
+    data.append(
+        {
+            "Preview": f"https://picsum.photos/400/200?lock={i}",
+            "Views": np.random.randint(0, 1000),
+            "Active": np.random.choice([True, False]),
+            "Category": np.random.choice(["🤖 LLM", "📊 Data", "⚙️ Tool"]),
+            "Progress": np.random.randint(1, 100),
+        }
+    )
+data = pd.DataFrame(data)
 
-st.pydeck_chart(pdk.Deck(
-    map_style=None,
-    initial_view_state=pdk.ViewState(
-        latitude=37.76,
-        longitude=-122.4,
-        zoom=11,
-        pitch=50,
-    ),
-    layers=[
-        pdk.Layer(
-           'HexagonLayer',
-           data=chart_data,
-           get_position='[lon, lat]',
-           radius=200,
-           elevation_scale=4,
-           elevation_range=[0, 1000],
-           pickable=True,
-           extruded=True,
-        ),
-        pdk.Layer(
-            'ScatterplotLayer',
-            data=chart_data,
-            get_position='[lon, lat]',
-            get_color='[200, 30, 0, 160]',
-            get_radius=200,
-        ),
-    ],
-))
+config = {
+    "Preview": st.column_config.ImageColumn(),
+    "Progress": st.column_config.ProgressColumn(),
+}
+
+if st.toggle("Enable editing"):
+    edited_data = st.data_editor(data, column_config=config, use_container_width=True)
+else:
+    st.dataframe(data, column_config=config, use_container_width=True)
