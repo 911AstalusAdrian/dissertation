@@ -11,4 +11,5 @@ st.title('F1 Driver-Car Compatibility Dashboard')
 st.write('Explore driver synergy using telemetry data.')
 
 driver_df = load_driver_data()
+print(driver_df)
 st.dataframe(driver_df)

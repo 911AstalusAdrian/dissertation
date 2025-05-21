@@ -42,3 +42,5 @@ def get_car_data(session_key=None, driver_number=None):
 def get_driver(driver_number=None, session_key=None):
     params = {"driver_number":driver_number, "session_key": session_key}
     return fetch_static_data("drivers", params)
+
+print(get_driver(driver_number=1, session_key='latest'))
