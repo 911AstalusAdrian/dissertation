@@ -11,11 +11,11 @@ def fetch_openf1_data(endpoint: str, params: dict = {}) -> pd.DataFrame:
     offset = 0
 
     while True:
-        params.update({"limit": limit, "offset": offset})
+        # params.update({"limit": limit, "offset": offset})
         response = requests.get(BASE_URL + endpoint, params=params)
         response.raise_for_status()
         data = response.json()
-
+        print(data)
         if not data: 
             break
 
