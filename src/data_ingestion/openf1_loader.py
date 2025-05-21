@@ -15,7 +15,6 @@ def fetch_openf1_data(endpoint: str, params: dict = {}) -> pd.DataFrame:
         response = requests.get(BASE_URL + endpoint, params=params)
         response.raise_for_status()
         data = response.json()
-        print(data)
         if not data: 
             break
 
@@ -23,6 +22,14 @@ def fetch_openf1_data(endpoint: str, params: dict = {}) -> pd.DataFrame:
         offset += limit
 
     return pd.DataFrame(all_data)
+
+def fetch_static_data(endpoint: str, params: dict = {}) -> pd.DataFrame:
+    data = []
+    response = requests.get(BASE_URL + endpoint, params=params)
+    response.raise_for_status()
+    data = response.json()
+    
+    return pd.DataFrame(data)
 
 def get_laps(year=2023, session_key=None, driver_number=None):
     params = {"session_key": session_key, "driver_number": driver_number, "year": year}
@@ -34,4 +41,4 @@ def get_car_data(session_key=None, driver_number=None):
 
 def get_driver(driver_number=None, session_key=None):
     params = {"driver_number":driver_number, "session_key": session_key}
-    return fetch_openf1_data("drivers", params)
+    return fetch_static_data("drivers", params)
