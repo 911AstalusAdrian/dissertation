@@ -34,7 +34,7 @@ def load_laps_count():
 def get_stats():
     drivers_df = load_drivers_count()
     sessions_df = load_sessions_count()
-    laps_df = load_laps_count()
+    #laps_df = load_laps_count()
 
     return drivers_df, sessions_df, 200, 200#laps_df
 
