@@ -45,7 +45,7 @@ def get_sessions(circuit_key=None, meeting_key=None, session_key=None, session_n
     return fetch_static_data("sessions", params)
 
 def get_sessions_count():
-    return get_sessions().count()
+    return get_sessions()['session_key'].count()
 
 def get_distinct_drivers(country_code=None, driver_number=None, meeting_key=None, session_key=None, team_name=None):
     params = {'country_code': country_code,
@@ -58,7 +58,7 @@ def get_distinct_drivers(country_code=None, driver_number=None, meeting_key=None
     return unique_drivers
 
 def get_distinct_drivers_count():
-    return get_distinct_drivers().count()
+    return get_distinct_drivers()['full_name'].count()
 
 def get_laps(year=2023, session_key=None, driver_number=None):
     params = {"session_key": session_key, "driver_number": driver_number, "year": year}
@@ -78,4 +78,4 @@ def get_driver(driver_number=None, session_key=None):
 
 
 
-print(get_distinct_drivers())
+print(get_sessions_count())
