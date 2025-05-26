@@ -65,7 +65,7 @@ def get_laps(year=2023, session_key=None, driver_number=None):
     return fetch_openf1_data("laps", params)
 
 def get_laps_count():
-    all_laps = fetch_static_data('laps')
+    all_laps = fetch_static_data('laps') # need to make multiple calls, iterate through sessions
     return all_laps.count()
 
 def get_car_data(session_key=None, driver_number=None):

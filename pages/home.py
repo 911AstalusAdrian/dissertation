@@ -36,7 +36,7 @@ def get_stats():
     sessions_df = load_sessions_count()
     laps_df = load_laps_count()
 
-    return drivers_df, sessions_df, laps_df
+    return drivers_df, sessions_df, 200, 200#laps_df
 
 st.title('F1 Driver-Car Compatibility Dashboard')
 st.markdown("""
