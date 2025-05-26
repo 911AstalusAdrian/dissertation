@@ -30,6 +30,11 @@ def fetch_static_data(endpoint: str, params: dict = {}) -> pd.DataFrame:
     data = response.json()
     return pd.DataFrame(data)
 
+def get_last_session() -> str:
+    df = fetch_static_data("sessions")
+    latest_session = df.sort_values("session_key", ascending=False).iloc[0]["session_key"]
+    return str(latest_session)
+
 def get_sessions(circuit_key=None, meeting_key=None, session_key=None, session_name=None, session_type=None, year=None):
     params = {"circuit_key": circuit_key,
               "meeting_key": meeting_key,
@@ -39,10 +44,8 @@ def get_sessions(circuit_key=None, meeting_key=None, session_key=None, session_n
               "year": year}
     return fetch_static_data("sessions", params)
 
-def get_last_session() -> str:
-    df = fetch_static_data("sessions")
-    latest_session = df.sort_values("session_key", ascending=False).iloc[0]["session_key"]
-    return str(latest_session)
+def get_sessions_count():
+    return get_sessions().count()
 
 def get_distinct_drivers(country_code=None, driver_number=None, meeting_key=None, session_key=None, team_name=None):
     params = {'country_code': country_code,
@@ -54,10 +57,16 @@ def get_distinct_drivers(country_code=None, driver_number=None, meeting_key=None
     unique_drivers = all_drivers.drop_duplicates(subset='full_name')
     return unique_drivers
 
+def get_distinct_drivers_count():
+    return get_distinct_drivers().count()
 
 def get_laps(year=2023, session_key=None, driver_number=None):
     params = {"session_key": session_key, "driver_number": driver_number, "year": year}
     return fetch_openf1_data("laps", params)
+
+def get_laps_count():
+    all_laps = fetch_static_data('laps')
+    return all_laps.count()
 
 def get_car_data(session_key=None, driver_number=None):
     params = {"session_key": session_key, "driver_number": driver_number}
