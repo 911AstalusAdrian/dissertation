@@ -11,7 +11,7 @@ def load_driver_data():
 
 def load_drivers_data():
     drivers = get_distinct_drivers()
-    return drivers.count(), drivers
+    return drivers
 
 def load_teams_data():
     pass
@@ -38,13 +38,13 @@ It combines real-world Formula 1 race data from multiple APIs to analyse pace, s
 """)
 
 
-num_drivers, num_teams, num_sessions, total_laps = get_stats()
-col1, col2, col3, col4 = st.columns(4)
-col1.metric("Drivers", num_drivers)
-col2.metric("Teams", num_teams)
-col3.metric("Sessions", num_sessions)
-col4.metric("Laps", total_laps)
+# num_drivers, num_teams, num_sessions, total_laps = get_stats()
+# col1, col2, col3, col4 = st.columns(4)
+# col1.metric("Drivers", num_drivers)
+# col2.metric("Teams", num_teams)
+# col3.metric("Sessions", num_sessions)
+# col4.metric("Laps", total_laps)
 
 
-drivers_df = load_drivers_data()[1]
+drivers_df = load_drivers_data()
 st.dataframe(drivers_df)
