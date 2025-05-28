@@ -42,12 +42,12 @@ It combines real-world Formula 1 race data from multiple APIs to analyse pace, s
 """)
 
 
-total_drivers, total_teams, total_laps = get_stats()
+total_drivers, total_teams, total_laps , last_value = get_stats()
 col1, col2, col3, col4 = st.columns(4)
 col1.metric("Drivers", total_drivers)
 col2.metric("Teams", total_teams)
 col3.metric("Laps", total_laps)
-col4.metric("Laps", total_laps)
+col4.metric("Last KPI", last_value)
 
 
 drivers_df = load_drivers_data()
