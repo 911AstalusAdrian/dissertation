@@ -28,7 +28,8 @@ def load_laps_count():
 def get_stats():
     drivers_df = get_distinct_drivers_count()
     sessions_df = get_sessions_count()
-    laps_df = get_laps_count()
+    # laps_df = get_laps_count()
+    laps_df = 155489
 
     return drivers_df, sessions_df, laps_df, 200
 
@@ -41,14 +42,18 @@ This app explores how well drivers 'fit' their cars based on telemetry and perfo
 It combines real-world Formula 1 race data from multiple APIs to analyse pace, style and synergy.
 """)
 
+season = st.selectbox('Choose Season', options=[2023, 2024, 2025])
+session_type = st.selectbox('Session Type', ['Race', 'Qualifying', 'Practice', 'Sprint'])
+selected_round = st.selectbox('Round', options=[1,2,3,4,5,6,7,8,9,10])
 
 total_drivers, total_teams, total_laps , last_value = get_stats()
 col1, col2, col3, col4 = st.columns(4)
 col1.metric("Drivers", total_drivers)
 col2.metric("Teams", total_teams)
 col3.metric("Laps", total_laps)
-col4.metric("Last KPI", last_value)
-
+col4.metric("Last KPI", last_value) ## Fastest Lap? Most Laps? Change based on the session 
+## 4th metric: Fastest Lap? Most Laps of a driver of the session?
+## maybe add a 5th metric based on the session?
 
 drivers_df = load_drivers_data()
 st.dataframe(drivers_df)
