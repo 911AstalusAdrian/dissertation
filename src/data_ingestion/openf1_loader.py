@@ -30,6 +30,8 @@ def fetch_static_data(endpoint: str, params: dict = {}) -> pd.DataFrame:
     data = response.json()
     return pd.DataFrame(data)
 
+### Sessions calls
+
 def get_last_session() -> str:
     df = fetch_static_data("sessions")
     latest_session = df.sort_values("session_key", ascending=False).iloc[0]["session_key"]
@@ -44,8 +46,20 @@ def get_sessions(circuit_key=None, meeting_key=None, session_key=None, session_n
               "year": year}
     return fetch_static_data("sessions", params)
 
+def get_sessions_list(circuit_key=None, meeting_key=None, session_key=None, session_name = None, session_type=None, year=None):
+    params = {'circuit_key': circuit_key,
+              'meeting_key': meeting_key,
+              'session_key': session_key,
+              'session_name': session_name,
+              'session_type': session_type,
+              'year': year}
+    all_sessions = fetch_static_data('sessions', params)
+    return all_sessions['session_key'].to_list()
+
 def get_sessions_count():
     return get_sessions()['session_key'].count()
+
+### Drivers calls
 
 def get_distinct_drivers(country_code=None, driver_number=None, meeting_key=None, session_key=None, team_name=None):
     params = {'country_code': country_code,
@@ -60,13 +74,26 @@ def get_distinct_drivers(country_code=None, driver_number=None, meeting_key=None
 def get_distinct_drivers_count():
     return get_distinct_drivers()['full_name'].count()
 
-def get_laps(year=2023, session_key=None, driver_number=None):
-    params = {"session_key": session_key, "driver_number": driver_number, "year": year}
-    return fetch_openf1_data("laps", params)
+### Laps calls
+
+def get_laps(driver_number=None, lap_number=None, meeting_key=None, session_key=None):
+    params = {'session_key':session_key,
+              'lap_number': lap_number,
+              'meeting_key': meeting_key,
+              'session_key': session_key}
+    return fetch_static_data('laps', params)
 
 def get_laps_count():
-    all_laps = fetch_static_data('laps') # need to make multiple calls, iterate through sessions
-    return all_laps.count()
+    total_laps = 0
+    sessions_list = get_sessions_list()
+
+    for session_key in sessions_list:
+        session_laps = get_laps(session_key=session_key)
+        total_laps += (len(session_laps))
+
+    return total_laps
+
+### Other calls
 
 def get_car_data(session_key=None, driver_number=None):
     params = {"session_key": session_key, "driver_number": driver_number}
@@ -77,5 +104,4 @@ def get_driver(driver_number=None, session_key=None):
     return fetch_static_data("drivers", params)
 
 
-
-print(get_sessions_count())
+print(get_laps_count())
