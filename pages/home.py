@@ -1,9 +1,18 @@
 import streamlit as st
 import pandas as pd
 
+from datetime import timedelta
 from src.data_ingestion.openf1_loader import *
 from src.data_ingestion.fastf1_loader import get_kpis_from_session
 
+### Misc
+def format_laptime(td:timedelta) -> str:
+    total_seconds = int(td.total_seconds())
+    minutes = total_seconds // 60
+    seconds = total_seconds % 60
+    milliseconds = int(td.microseconds / 1000)
+
+    return f'{minutes}:{seconds:02d}:{milliseconds:03d}'
 
 ### Driver-related methods
 def load_driver_data():
@@ -81,33 +90,12 @@ if load_data:
             if kpis:
                     cols = st.columns(4)
                     cols[0].metric("Fastest Driver", kpis["fastest_driver"])
-                    cols[1].metric("Fastest Lap Time", str(kpis["fastest_lap"]))
+                    cols[1].metric("Fastest Lap Time", format_laptime(kpis["fastest_lap"]))
                     cols[2].metric("Fastest Lap Compound", kpis["fastest_lap_compound"])
                     cols[3].metric("Total Laps", kpis["total_laps"])
-                    st.write(f'Total number of laps this session: {kpis['total_laps']} laps')
                     st.write(f"Driver with Most Laps: {kpis['top_driver']} ({kpis['max_laps']} laps)")
                     st.write(f"Team with Most Laps: {kpis['top_team']} ({kpis['max_laps_team']} laps)")
             else:
                 st.warning("No KPIs were generated from this session.")
         except Exception as e:
             st.error(f"An error occurred: {e}")
-
-
-
-
-
-# if kpis:
-#     cols = st.columns(4)
-#     cols[0].metric("Fastest Driver", kpis["fastest_driver"])
-#     cols[1].metric("Fastest Lap Time", str(kpis["fastest_lap"]))
-#     cols[2].metric("Fastest Lap Compound", kpis["fastest_compound"])
-#     cols[3].metric("Total Laps", kpis["total_laps"])
-#     st.write(f'Total number of laps this session: {kpis['total_laps']} laps')
-#     st.write(f"Driver with Most Laps: {kpis['top_driver']} ({kpis['max_laps']} laps)")
-#     st.write(f"Team with Most Laps: {kpis['top_team']} ({kpis['max_laps_team']} laps)")
- ## Fastest Lap? Most Laps? Change based on the session 
-## 4th metric: Fastest Lap? Most Laps of a driver of the session?
-## maybe add a 5th metric based on the session?
-
-# drivers_df = load_drivers_data()
-# st.dataframe(drivers_df)
