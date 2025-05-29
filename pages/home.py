@@ -33,7 +33,10 @@ def get_stats():
 
     return drivers_df, sessions_df, laps_df, 200
 
-
+def get_session_data(season, session_type, selected_round):
+    st.toast(season)
+    st.toast(session_type)
+    st.toast(selected_round)
 
 
 st.title('F1 Driver-Car Compatibility Dashboard')
@@ -45,6 +48,8 @@ It combines real-world Formula 1 race data from multiple APIs to analyse pace, s
 season = st.selectbox('Choose Season', options=[2023, 2024, 2025])
 session_type = st.selectbox('Session Type', ['Race', 'Qualifying', 'Practice', 'Sprint'])
 selected_round = st.selectbox('Round', options=[1,2,3,4,5,6,7,8,9,10])
+button = st.button('Get session info', on_click=get_session_data(season, session_type, selected_round))
+
 
 total_drivers, total_teams, total_laps , last_value = get_stats()
 col1, col2, col3, col4 = st.columns(4)
@@ -55,5 +60,5 @@ col4.metric("Last KPI", last_value) ## Fastest Lap? Most Laps? Change based on t
 ## 4th metric: Fastest Lap? Most Laps of a driver of the session?
 ## maybe add a 5th metric based on the session?
 
-drivers_df = load_drivers_data()
-st.dataframe(drivers_df)
+# drivers_df = load_drivers_data()
+# st.dataframe(drivers_df)
