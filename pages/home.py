@@ -38,12 +38,19 @@ def get_session_data(season, session_type, selected_round):
     st.toast(session_type)
     st.toast(selected_round)
 
-
+### Title and markdown
 st.title('F1 Driver-Car Compatibility Dashboard')
 st.markdown("""
 This app explores how well drivers 'fit' their cars based on telemetry and performance data.
 It combines real-world Formula 1 race data from multiple APIs to analyse pace, style and synergy.
 """)
+
+### Session picker
+if "season" not in st.session_state:
+    st.session_state.season = 2023
+
+if "sessions" not in st.session_state:
+    st.session_state.sessions = {}
 
 sessions = {}
 rounds = []
@@ -52,20 +59,21 @@ race_sessions = []
 picker_col1, picker_col2, picker_col3, picker_col4 = st.columns([2,2,2,1])
 with picker_col1:
     season = st.selectbox('Choose Season', options=[2023, 2024, 2025])
-    if season:
-        sessions = get_races_per_season()
-        rounds = list(sessions.keys())
+    st.session_state.season = season
+    st.session_state.sessions = get_races_per_season(season=season)
+    rounds = list(sessions.keys())
 with picker_col2:
-    selected_round = st.selectbox('Round', options=rounds)
-    race_sessions = sessions[selected_round]
+    if st.session_state.season:
+        selected_round = st.selectbox('Round', options=rounds)
 with picker_col3:
-    session_type = st.selectbox('Session Type', race_sessions)
+    if selected_round:
+        race_sessions = st.session_state.sessions[selected_round]
+        session_type = st.selectbox('Session Type', race_sessions)
 with picker_col4:
-    load_session = st.button('Get session info', on_click=get_session_data(season, session_type, selected_round))
+    if st.button('Get session info'):
+        get_session_data(season=st.session_state.season, session_type=session_type, selected_round=selected_round)
 
-
-
-
+### KPI Data
 total_drivers, total_teams, total_laps , last_value = get_stats()
 col1, col2, col3, col4 = st.columns(4)
 col1.metric("Drivers", total_drivers)
