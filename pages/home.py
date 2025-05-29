@@ -2,6 +2,7 @@ import streamlit as st
 import pandas as pd
 
 from src.data_ingestion.openf1_loader import *
+from src.data_ingestion.fastf1_loader import *
 
 
 ### Driver-related methods
@@ -34,9 +35,7 @@ def get_stats():
     return drivers_df, sessions_df, laps_df, 200
 
 def get_session_data(season, session_type, selected_round):
-    st.toast(season)
-    st.toast(session_type)
-    st.toast(selected_round)
+    return get_kpis_from_session(season, session_type, selected_round)
 
 ### Title and markdown
 st.title('F1 Driver-Car Compatibility Dashboard')
@@ -71,15 +70,12 @@ with picker_col3:
         session_type = st.selectbox('Session Type', race_sessions)
 with picker_col4:
     if st.button('Get session info'):
-        get_session_data(season=st.session_state.season, session_type=session_type, selected_round=selected_round)
+        kpis = get_session_data(season=st.session_state.season, session_type=session_type, selected_round=selected_round)
 
 ### KPI Data
-total_drivers, total_teams, total_laps , last_value = get_stats()
-col1, col2, col3, col4 = st.columns(4)
-col1.metric("Drivers", total_drivers)
-col2.metric("Teams", total_teams)
-col3.metric("Laps", total_laps)
-col4.metric("Last KPI", last_value) ## Fastest Lap? Most Laps? Change based on the session 
+cols = st.columns(4)
+cols[0].metric
+ ## Fastest Lap? Most Laps? Change based on the session 
 ## 4th metric: Fastest Lap? Most Laps of a driver of the session?
 ## maybe add a 5th metric based on the session?
 
