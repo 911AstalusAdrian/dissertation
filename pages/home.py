@@ -45,10 +45,25 @@ This app explores how well drivers 'fit' their cars based on telemetry and perfo
 It combines real-world Formula 1 race data from multiple APIs to analyse pace, style and synergy.
 """)
 
-season = st.selectbox('Choose Season', options=[2023, 2024, 2025])
-session_type = st.selectbox('Session Type', ['Race', 'Qualifying', 'Practice', 'Sprint'])
-selected_round = st.selectbox('Round', options=[1,2,3,4,5,6,7,8,9,10])
-button = st.button('Get session info', on_click=get_session_data(season, session_type, selected_round))
+sessions = {}
+rounds = []
+race_sessions = []
+
+picker_col1, picker_col2, picker_col3, picker_col4 = st.columns([2,2,2,1])
+with picker_col1:
+    season = st.selectbox('Choose Season', options=[2023, 2024, 2025])
+    if season:
+        sessions = get_races_per_season()
+        rounds = list(sessions.keys())
+with picker_col2:
+    selected_round = st.selectbox('Round', options=rounds)
+    race_sessions = sessions[selected_round]
+with picker_col3:
+    session_type = st.selectbox('Session Type', race_sessions)
+with picker_col4:
+    load_session = st.button('Get session info', on_click=get_session_data(season, session_type, selected_round))
+
+
 
 
 total_drivers, total_teams, total_laps , last_value = get_stats()

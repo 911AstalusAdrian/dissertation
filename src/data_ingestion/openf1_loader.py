@@ -59,6 +59,18 @@ def get_sessions_list(circuit_key=None, meeting_key=None, session_key=None, sess
 def get_sessions_count():
     return get_sessions()['session_key'].count()
 
+def get_races_per_season(season=2023):
+    params = {'year': season}
+    season_sessions = fetch_static_data('sessions', params)
+
+    grouped = (
+    season_sessions.groupby('circuit_short_name')['session_name']
+    .apply(lambda x: sorted(set(x), key=lambda y: y.lower()))
+    .to_dict()
+    )
+
+    return grouped
+
 ### Drivers calls
 
 def get_distinct_drivers(country_code=None, driver_number=None, meeting_key=None, session_key=None, team_name=None):
@@ -104,4 +116,4 @@ def get_driver(driver_number=None, session_key=None):
     return fetch_static_data("drivers", params)
 
 
-print(get_laps_count())
+# print(get_races_per_season(season=2025))
