@@ -69,23 +69,42 @@ with picker_col3:
         race_sessions = st.session_state.sessions[selected_round]
         session_type = st.selectbox('Session Type', race_sessions)
 with picker_col4:
-    if st.button('Get session info'):
-        with st.spinner('Loading session data...'):
-            kpis = get_session_kpis(season=st.session_state.season, session_type=session_type, selected_round=selected_round)
+    load_data = st.button('Get session info')
 
 
-print(kpis)
 
 ### KPI Data
-if kpis:
-    cols = st.columns(4)
-    cols[0].metric("Fastest Driver", kpis["fastest_driver"])
-    cols[1].metric("Fastest Lap Time", str(kpis["fastest_lap"]))
-    cols[2].metric("Fastest Lap Compound", kpis["fastest_compound"])
-    cols[3].metric("Total Laps", kpis["total_laps"])
-    st.write(f'Total number of laps this session: {kpis['total_laps']} laps')
-    st.write(f"Driver with Most Laps: {kpis['top_driver']} ({kpis['max_laps']} laps)")
-    st.write(f"Team with Most Laps: {kpis['top_team']} ({kpis['max_laps_team']} laps)")
+if load_data:
+    with st.spinner('Loading session data...'):
+        try:
+            kpis = get_session_kpis(season, selected_round, session_type)
+            if kpis:
+                    cols = st.columns(4)
+                    cols[0].metric("Fastest Driver", kpis["fastest_driver"])
+                    cols[1].metric("Fastest Lap Time", str(kpis["fastest_lap"]))
+                    cols[2].metric("Fastest Lap Compound", kpis["fastest_compound"])
+                    cols[3].metric("Total Laps", kpis["total_laps"])
+                    st.write(f'Total number of laps this session: {kpis['total_laps']} laps')
+                    st.write(f"Driver with Most Laps: {kpis['top_driver']} ({kpis['max_laps']} laps)")
+                    st.write(f"Team with Most Laps: {kpis['top_team']} ({kpis['max_laps_team']} laps)")
+            else:
+                st.warning("No KPIs were generated from this session.")
+        except Exception as e:
+            st.error(f"An error occurred: {e}")
+
+
+
+
+
+# if kpis:
+#     cols = st.columns(4)
+#     cols[0].metric("Fastest Driver", kpis["fastest_driver"])
+#     cols[1].metric("Fastest Lap Time", str(kpis["fastest_lap"]))
+#     cols[2].metric("Fastest Lap Compound", kpis["fastest_compound"])
+#     cols[3].metric("Total Laps", kpis["total_laps"])
+#     st.write(f'Total number of laps this session: {kpis['total_laps']} laps')
+#     st.write(f"Driver with Most Laps: {kpis['top_driver']} ({kpis['max_laps']} laps)")
+#     st.write(f"Team with Most Laps: {kpis['top_team']} ({kpis['max_laps_team']} laps)")
  ## Fastest Lap? Most Laps? Change based on the session 
 ## 4th metric: Fastest Lap? Most Laps of a driver of the session?
 ## maybe add a 5th metric based on the session?
