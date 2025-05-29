@@ -1,9 +1,23 @@
 # Responsible for loading the data from the FastF1 Python package
 import fastf1
 
+
 def load_session_data(season, round_name, session_type):
+
+    session_type_formatted = None
+
+    match session_type:
+        case 'Practice 1':
+            session_type_formatted = 'FP1'
+        case 'Practice 2':
+            session_type_formatted = 'FP2'
+        case 'Practice 3':
+            session_type_formatted = 'FP3'
+        case _:
+            session_type_formatted = session_type
+
     try:
-        session = fastf1.get_session(season, round_name, session_type)
+        session = fastf1.get_session(season, round_name, session_type_formatted)
         session.load()
         return session
     except Exception as e:
@@ -52,3 +66,6 @@ def get_kpis_from_session(season, session_type, selected_round):
     except Exception as e:
         print(f'Error extracting KPIs: {e}')
         return None
+
+
+print(get_kpis_from_session(2025, 'Sakhir', 'Practice 1'))

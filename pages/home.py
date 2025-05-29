@@ -82,7 +82,7 @@ if load_data:
                     cols = st.columns(4)
                     cols[0].metric("Fastest Driver", kpis["fastest_driver"])
                     cols[1].metric("Fastest Lap Time", str(kpis["fastest_lap"]))
-                    cols[2].metric("Fastest Lap Compound", kpis["fastest_compound"])
+                    cols[2].metric("Fastest Lap Compound", kpis["fastest_lap_compound"])
                     cols[3].metric("Total Laps", kpis["total_laps"])
                     st.write(f'Total number of laps this session: {kpis['total_laps']} laps')
                     st.write(f"Driver with Most Laps: {kpis['top_driver']} ({kpis['max_laps']} laps)")
