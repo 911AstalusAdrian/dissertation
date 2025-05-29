@@ -54,6 +54,7 @@ if "sessions" not in st.session_state:
 sessions = {}
 rounds = []
 race_sessions = []
+kpis = {}
 
 picker_col1, picker_col2, picker_col3, picker_col4 = st.columns([2,2,2,1])
 with picker_col1:
