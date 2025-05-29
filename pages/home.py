@@ -73,6 +73,9 @@ with picker_col4:
         with st.spinner('Loading session data...'):
             kpis = get_session_kpis(season=st.session_state.season, session_type=session_type, selected_round=selected_round)
 
+
+print(kpis)
+
 ### KPI Data
 if kpis:
     cols = st.columns(4)
