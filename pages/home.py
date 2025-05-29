@@ -61,7 +61,7 @@ with picker_col1:
     season = st.selectbox('Choose Season', options=[2023, 2024, 2025])
     st.session_state.season = season
     st.session_state.sessions = get_races_per_season(season=season)
-    rounds = list(sessions.keys())
+    rounds = list(st.session_state.sessions.keys())
 with picker_col2:
     if st.session_state.season:
         selected_round = st.selectbox('Round', options=rounds)
