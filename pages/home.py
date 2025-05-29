@@ -34,7 +34,7 @@ def get_stats():
 
     return drivers_df, sessions_df, laps_df, 200
 
-def get_session_data(season, session_type, selected_round):
+def get_session_kpis(season, session_type, selected_round):
     return get_kpis_from_session(season, session_type, selected_round)
 
 ### Title and markdown
@@ -51,10 +51,9 @@ if "season" not in st.session_state:
 if "sessions" not in st.session_state:
     st.session_state.sessions = {}
 
-sessions = {}
-rounds = []
-race_sessions = []
-kpis = {}
+rounds = None
+race_sessions = None
+kpis = None
 
 picker_col1, picker_col2, picker_col3, picker_col4 = st.columns([2,2,2,1])
 with picker_col1:
@@ -71,14 +70,19 @@ with picker_col3:
         session_type = st.selectbox('Session Type', race_sessions)
 with picker_col4:
     if st.button('Get session info'):
-        kpis = get_session_data(season=st.session_state.season, session_type=session_type, selected_round=selected_round)
+        with st.spinner('Loading session data...'):
+            kpis = get_session_kpis(season=st.session_state.season, session_type=session_type, selected_round=selected_round)
 
 ### KPI Data
-cols = st.columns(4)
-cols[0].metric("Fastest Driver", kpis["fastest_driver"])
-cols[1].metric("Fastest Lap Time", str(kpis["fastest_lap"]))
-cols[2].metric("Fastest Lap Compound", kpis["fastest_compound"])
-cols[3].metric("Total Laps", kpis["total_laps"])
+if kpis:
+    cols = st.columns(4)
+    cols[0].metric("Fastest Driver", kpis["fastest_driver"])
+    cols[1].metric("Fastest Lap Time", str(kpis["fastest_lap"]))
+    cols[2].metric("Fastest Lap Compound", kpis["fastest_compound"])
+    cols[3].metric("Total Laps", kpis["total_laps"])
+    st.write(f'Total number of laps this session: {kpis['total_laps']} laps')
+    st.write(f"Driver with Most Laps: {kpis['top_driver']} ({kpis['max_laps']} laps)")
+    st.write(f"Team with Most Laps: {kpis['top_team']} ({kpis['max_laps_team']} laps)")
  ## Fastest Lap? Most Laps? Change based on the session 
 ## 4th metric: Fastest Lap? Most Laps of a driver of the session?
 ## maybe add a 5th metric based on the session?
