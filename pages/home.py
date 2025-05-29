@@ -2,7 +2,7 @@ import streamlit as st
 import pandas as pd
 
 from src.data_ingestion.openf1_loader import *
-from src.data_ingestion.fastf1_loader import *
+from src.data_ingestion.fastf1_loader import get_kpis_from_session
 
 
 ### Driver-related methods
@@ -74,7 +74,10 @@ with picker_col4:
 
 ### KPI Data
 cols = st.columns(4)
-cols[0].metric
+cols[0].metric("Fastest Driver", kpis["fastest_driver"])
+cols[1].metric("Fastest Lap Time", str(kpis["fastest_lap"]))
+cols[2].metric("Fastest Lap Compound", kpis["fastest_compound"])
+cols[3].metric("Total Laps", kpis["total_laps"])
  ## Fastest Lap? Most Laps? Change based on the session 
 ## 4th metric: Fastest Lap? Most Laps of a driver of the session?
 ## maybe add a 5th metric based on the session?

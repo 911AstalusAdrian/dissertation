@@ -52,6 +52,3 @@ def get_kpis_from_session(season, session_type, selected_round):
     except Exception as e:
         print(f'Error extracting KPIs: {e}')
         return None
-    
-
-print(get_kpis_from_session(2025, 'Sakhir', 'Race'))
