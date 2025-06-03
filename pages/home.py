@@ -78,6 +78,7 @@ with picker_col3:
         race_sessions = st.session_state.sessions[selected_round]
         session_type = st.selectbox('Session Type', race_sessions)
 with picker_col4:
+    st.markdown('')
     load_data = st.button('Get session info')
 
 
@@ -88,13 +89,17 @@ if load_data:
         try:
             kpis = get_session_kpis(season, selected_round, session_type)
             if kpis:
-                    cols = st.columns(4)
+                    cols = st.columns(6)
                     cols[0].metric("Fastest Driver", kpis["fastest_driver"])
                     cols[1].metric("Fastest Lap Time", format_laptime(kpis["fastest_lap"]))
                     cols[2].metric("Fastest Lap Compound", kpis["fastest_lap_compound"])
                     cols[3].metric("Total Laps", kpis["total_laps"])
-                    st.write(f"Driver with Most Laps: {kpis['top_driver']} ({kpis['max_laps']} laps)")
-                    st.write(f"Team with Most Laps: {kpis['top_team']} ({kpis['max_laps_team']} laps)")
+                    cols[4].metric("Most Laps by a Driver", f"{kpis['top_driver']} - {kpis['max_laps']} laps")
+                    cols[5].metric('Most Laps by a Team', f'{kpis['top_team']} - {kpis['max_laps_team']} laps')
+                    # st.write(f"Driver with Most Laps: {kpis['top_driver']} ({kpis['max_laps']} laps)")
+                    # st.write(f"Team with Most Laps: {kpis['top_team']} ({kpis['max_laps_team']} laps)")
+
+                    st.button('Get driver data')
             else:
                 st.warning("No KPIs were generated from this session.")
         except Exception as e:
