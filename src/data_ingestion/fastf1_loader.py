@@ -1,5 +1,6 @@
 # Responsible for loading the data from the FastF1 Python package
 import fastf1
+import pandas as pd
 from datetime import timedelta
 
 def format_laptime(td:timedelta) -> str:
@@ -88,9 +89,10 @@ def get_session_top5_drivers_laps(season, selected_round, session_type):
     top5_drivers = session.results[:5]['Abbreviation'].to_list()
 
     top5_laps = session.laps.pick_drivers(top5_drivers)
-
     top5_laps = top5_laps.dropna(subset=['LapTime'])
+    top5_laps['LapTimeSeconds'] = top5_laps['LapTime'].dt.total_seconds()
 
+    final_df = pd.DataFrame(top5_laps)
     return top5_laps[['LapTime', 'LapNumber', 'Driver']]
 
 def get_session_laptimes(season, selected_round, session_type):

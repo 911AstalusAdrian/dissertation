@@ -90,13 +90,13 @@ if load_data:
                     cols[1].metric("Fastest Lap Time", format_laptime(kpis["fastest_lap"]))
                     cols[2].metric("Fastest Lap Compound", kpis["fastest_lap_compound"])
                     cols[3].metric("Total Laps", kpis["total_laps"])
-                    cols[4].metric("Most Laps by a Driver", f"{kpis['top_driver']} - {kpis['max_laps']} laps")
-                    cols[5].metric('Most Laps by a Team', f'{kpis['top_team']} - {kpis['max_laps_team']} laps')
+                    cols[4].metric("Most Laps by a Driver", f"{kpis['top_driver']} - {kpis['max_laps']}")
+                    cols[5].metric('Most Laps by a Team', f'{kpis['top_team']} - {kpis['max_laps_team']}')
             else:
                 st.warning("No KPIs were generated from this session.")
 
             # Top 5 drivers laptimes line chart
-            if top5_driver_laps:
+            if not top5_driver_laps.empty:
                 fig = px.line(
                     top5_driver_laps,
                     x='Lap Number',
