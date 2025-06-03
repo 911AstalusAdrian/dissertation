@@ -2,3 +2,4 @@ streamlit
 pandas
 numpy
 fastf1
+plotly
