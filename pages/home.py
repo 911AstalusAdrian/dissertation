@@ -99,8 +99,8 @@ if load_data:
             if not top5_driver_laps.empty:
                 fig = px.line(
                     top5_driver_laps,
-                    x='Lap Number',
-                    y='Lap Time (s)',
+                    x='LapNumber',
+                    y='LapTimeSeconds',
                     color = 'Driver',
                     markers = True,
                     title = 'Lap Time trend for top 5 drivers',
