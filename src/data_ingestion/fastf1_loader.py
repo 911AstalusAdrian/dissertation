@@ -93,7 +93,7 @@ def get_session_top5_drivers_laps(season, selected_round, session_type):
     top5_laps['LapTimeSeconds'] = top5_laps['LapTime'].dt.total_seconds()
 
     final_df = pd.DataFrame(top5_laps)
-    return final_df[['LapTime', 'LapNumber', 'Driver']]
+    return final_df[['LapTimeSeconds', 'LapNumber', 'Driver']]
 
 def get_session_laptimes(season, selected_round, session_type):
     # WIP
