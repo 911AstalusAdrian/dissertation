@@ -1,11 +1,21 @@
 # Responsible for loading the data from the FastF1 Python package
 import fastf1
+from datetime import timedelta
 
+def format_laptime(td:timedelta) -> str:
 
-def load_session_data(season, round_name, session_type):
+    if td is not None: 
+        total_seconds = int(td.total_seconds())
+        minutes = total_seconds // 60
+        seconds = total_seconds % 60
+        milliseconds = int(td.microseconds / 1000)
 
+        return f'{minutes}:{seconds:02d}:{milliseconds:03d}'
+    
+    else: return None
+
+def format_session_type(session_type):
     session_type_formatted = None
-
     match session_type:
         case 'Practice 1':
             session_type_formatted = 'FP1'
@@ -16,6 +26,11 @@ def load_session_data(season, round_name, session_type):
         case _:
             session_type_formatted = session_type
 
+    return session_type_formatted
+
+def load_session_data(season, round_name, session_type):
+
+    session_type_formatted = format_session_type(session_type)
     try:
         session = fastf1.get_session(season, round_name, session_type_formatted)
         session.load()
@@ -24,9 +39,9 @@ def load_session_data(season, round_name, session_type):
         print(f'Error loading session: {e}')
         return None
     
-def get_kpis_from_session(season, session_type, selected_round):
+def get_kpis_from_session(season, selected_round, session_type):
 
-    session = load_session_data(season, session_type, selected_round)
+    session = load_session_data(season, selected_round, session_type)
 
     if session is None:
         return None
@@ -68,4 +83,21 @@ def get_kpis_from_session(season, session_type, selected_round):
         return None
 
 
-print(get_kpis_from_session(2025, 'Sakhir', 'Practice 1'))
+def get_session_top5_drivers_laps(season, selected_round, session_type):
+    session = load_session_data(season, selected_round, session_type)
+    top5_drivers = session.results[:5]['Abbreviation'].to_list()
+
+    top5_laps = session.laps.pick_drivers(top5_drivers)
+
+    top5_laps = top5_laps.dropna(subset=['LapTime'])
+
+    return top5_laps[['LapTime', 'LapNumber', 'Driver']]
+
+def get_session_laptimes(season, selected_round, session_type):
+    # WIP
+    session = load_session_data(season, selected_round, session_type)
+    laps = session.results[:5]['Abbreviation']
+    return laps
+
+
+print(get_session_top5_drivers_laps(2025, 'Sakhir', 'Practice 1'))

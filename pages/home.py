@@ -1,18 +1,11 @@
 import streamlit as st
 import pandas as pd
+import plotly.express as px
 
 from datetime import timedelta
 from src.data_ingestion.openf1_loader import *
-from src.data_ingestion.fastf1_loader import get_kpis_from_session
-
-### Misc
-def format_laptime(td:timedelta) -> str:
-    total_seconds = int(td.total_seconds())
-    minutes = total_seconds // 60
-    seconds = total_seconds % 60
-    milliseconds = int(td.microseconds / 1000)
-
-    return f'{minutes}:{seconds:02d}:{milliseconds:03d}'
+from src.data_ingestion.fastf1_loader import get_kpis_from_session, get_session_top5_drivers_laps
+from src.utils.df_utils import format_laptime
 
 ### Driver-related methods
 def load_driver_data():
@@ -88,6 +81,9 @@ if load_data:
     with st.spinner('Loading session data...'):
         try:
             kpis = get_session_kpis(season, selected_round, session_type)
+            top5_driver_laps = get_session_top5_drivers_laps(season, selected_round, session_type)
+            
+            ### KPI Cards
             if kpis:
                     cols = st.columns(6)
                     cols[0].metric("Fastest Driver", kpis["fastest_driver"])
@@ -96,11 +92,32 @@ if load_data:
                     cols[3].metric("Total Laps", kpis["total_laps"])
                     cols[4].metric("Most Laps by a Driver", f"{kpis['top_driver']} - {kpis['max_laps']} laps")
                     cols[5].metric('Most Laps by a Team', f'{kpis['top_team']} - {kpis['max_laps_team']} laps')
-                    # st.write(f"Driver with Most Laps: {kpis['top_driver']} ({kpis['max_laps']} laps)")
-                    # st.write(f"Team with Most Laps: {kpis['top_team']} ({kpis['max_laps_team']} laps)")
-
-                    st.button('Get driver data')
             else:
                 st.warning("No KPIs were generated from this session.")
+
+            # Top 5 drivers laptimes line chart
+            if top5_driver_laps:
+                fig = px.line(
+                    top5_driver_laps,
+                    x='Lap Number',
+                    y='Lap Time (s)',
+                    color = 'Driver',
+                    markers = True,
+                    title = 'Lap Time trend for top 5 drivers',
+                    labels = {
+                        'LapNumber': 'Lap Number',
+                        'LapTimeSeconds': 'Lap Time (s)',
+                        'Driver': 'Driver'
+                    }
+                )
+                fig.update_layout(
+                    xaxis=dict(dtick=1),
+                    yaxis_title='Lap Time (seconds)',
+                    legend_title='Driver',
+                    template='plotly_white'
+                )
+                st.plotly_chart(fig, use_container_width=True)  
+            else:
+                st.warning('No Top 5 driver laptimes generated from this session')
         except Exception as e:
             st.error(f"An error occurred: {e}")
