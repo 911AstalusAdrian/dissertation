@@ -127,7 +127,7 @@ if load_data:
                 names='Compound',
                 values='TotalLaps',
                 title='Tyre Compound Distribution (Total Laps)',
-                color = 'Compound'
+                color='Compound',
                 color_discrete_map={
                     'HARD': '#FFFFFF',
                     'MEDIUM': '#FFD700',
