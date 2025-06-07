@@ -128,9 +128,9 @@ if load_data:
                 values='TotalLaps',
                 title='Tyre Compound Distribution (Total Laps)',
                 color_discrete_map={
-                    'HARD': 'white',
-                    'MEDIUM': 'yellow',
-                    'SOFT': 'red'})
+                    'HARD': '#FFFFFF',
+                    'MEDIUM': '#FFD700',
+                    'SOFT': '#FF4C4C'})
 
                 col1, col2 = st.columns([2, 3])  # Adjust width ratios as needed
 
