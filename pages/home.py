@@ -120,15 +120,18 @@ if load_data:
             else:
                 st.warning('No Top 5 driver laptimes generated from this session')
 
-            st.markdown('Hello')
-
             # Tyre Compound Usage bar/pie chart
             if not compound_summary.empty:
                 fig = px.pie(
                 compound_summary,
                 names='Compound',
                 values='TotalLaps',
-                title='Tyre Compound Distribution (Total Laps)'
+                title='Tyre Compound Distribution (Total Laps)',
+                color_discrete_map={
+                    'HARD': 'white',
+                    'MEDIUM': 'yellow',
+                    'SOFT': 'red'
+                }
                 )
                 selected = st.plotly_chart(fig, use_container_width=True)
             else:
