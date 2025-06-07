@@ -130,10 +130,28 @@ if load_data:
                 color_discrete_map={
                     'HARD': 'white',
                     'MEDIUM': 'yellow',
-                    'SOFT': 'red'
-                }
-                )
-                selected = st.plotly_chart(fig, use_container_width=True)
+                    'SOFT': 'red'})
+
+                col1, col2 = st.columns([2, 3])  # Adjust width ratios as needed
+
+# Display pie chart and capture click
+                with col1:
+                  selected = st.plotly_chart(fig, use_container_width=True)
+
+                # Display metrics based on selected compound
+                with col2:
+                    if selected:
+                        compound_stats = compound_summary[compound_summary['Compound'] == selected].iloc[0]
+
+                        st.subheader(f"Compound: {selected}")
+                        kpi1, kpi2, kpi3 = st.columns(3)
+                        kpi1.metric("Fastest Lap", f"{compound_stats['FastestLapTime']:.3f} sec")
+                        kpi2.metric("Avg Lap Time", f"{compound_stats['AverageLapTime']:.3f} sec")
+                        kpi3.metric("Total Laps", int(compound_stats['TotalLaps']))
+
+                        kpi4, kpi5 = st.columns(2)
+                        kpi4.metric("Longest Stint", int(compound_stats['LongestIndividualStint']))
+                        kpi5.metric("Avg Stint Length", f"{compound_stats['AverageStintLength']:.1f}")
             else:
                 st.warning('No compound summary was generated from this session')
         except Exception as e:
