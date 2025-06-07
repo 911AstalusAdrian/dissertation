@@ -123,7 +123,7 @@ if load_data:
             st.markdown('Hello')
 
             # Tyre Compound Usage bar/pie chart
-            if compound_summary:
+            if not compound_summary.empty:
                 fig = px.pie(
                 compound_summary,
                 names='Compound',
