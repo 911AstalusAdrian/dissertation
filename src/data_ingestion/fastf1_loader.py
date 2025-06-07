@@ -86,6 +86,7 @@ def get_kpis_from_session(season, selected_round, session_type):
 
 def get_session_top5_drivers_laps(season, selected_round, session_type):
     session = load_session_data(season, selected_round, session_type)
+
     top5_drivers = session.results[:5]['Abbreviation'].to_list()
 
     top5_laps = session.laps.pick_drivers(top5_drivers)
@@ -95,11 +96,64 @@ def get_session_top5_drivers_laps(season, selected_round, session_type):
     final_df = pd.DataFrame(top5_laps)
     return final_df[['LapTimeSeconds', 'LapNumber', 'Driver']]
 
-def get_session_laptimes(season, selected_round, session_type):
-    # WIP
+def get_session_tyre_distribution(season, selected_round, session_type):
     session = load_session_data(season, selected_round, session_type)
-    laps = session.results[:5]['Abbreviation']
-    return laps
+    laps = session.laps
+    laps['LapTimeSeconds'] = laps['LapTime'].dt.total_seconds()
+    grouped_laps = laps.groupby('Compound')
+    
+    total_laps = (
+        laps.groupby('Compound')
+        .size()
+        .reset_index(name='TotalLaps')
+    )
+
+    stint_lengths = (
+    laps
+    .groupby(['Compound', 'Driver', 'Stint'])
+    .size()
+    .reset_index(name='StintLength')
+    )
+
+    longest_stints = (
+        stint_lengths
+        .groupby('Compound')['StintLength']
+        .max()
+        .reset_index()
+        .rename(columns={'StintLength': 'LongestIndividualStint'})
+    )
+
+    average_stints = (
+        stint_lengths
+        .groupby('Compound')['StintLength']
+        .mean()
+        .reset_index()
+        .rename(columns={'StintLength' : 'AverageStintLength'})
+    )
+
+    fastest_laps = (
+        grouped_laps['LapTimeSeconds']
+        .min()
+    )
+
+    average_laps = (
+        grouped_laps['LapTimeSeconds']
+        .mean()
+    )
+
+    compound_summary = (
+    total_laps
+    .merge(longest_stints, on='Compound')
+    .merge(average_stints, on='Compound')
+    .merge(fastest_laps, on='Compound')
+    .merge(average_laps, on='Compound')
+    )
+
+    compound_summary.rename(columns={'LapTimeSeconds_x' : 'FastestLapTime',
+                                     'LapTimeSeconds_y' : 'AverageLapTime'},
+                            inplace=True)
+
+    return compound_summary
 
 
-print(get_session_top5_drivers_laps(2025, 'Sakhir', 'Practice 1'))
+print(get_session_tyre_distribution(2025, 'Sakhir', 'Practice 1'))

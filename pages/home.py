@@ -4,7 +4,7 @@ import plotly.express as px
 
 from datetime import timedelta
 from src.data_ingestion.openf1_loader import *
-from src.data_ingestion.fastf1_loader import get_kpis_from_session, get_session_top5_drivers_laps
+from src.data_ingestion.fastf1_loader import get_kpis_from_session, get_session_top5_drivers_laps, get_session_tyre_distribution
 from src.utils.df_utils import format_laptime
 
 ### Driver-related methods
@@ -82,7 +82,7 @@ if load_data:
         try:
             kpis = get_session_kpis(season, selected_round, session_type)
             top5_driver_laps = get_session_top5_drivers_laps(season, selected_round, session_type)
-            
+            compound_summary = get_session_tyre_distribution(season, selected_round, session_type)
             ### KPI Cards
             if kpis:
                     cols = st.columns(6)
@@ -119,5 +119,17 @@ if load_data:
                 st.plotly_chart(fig, use_container_width=True)  
             else:
                 st.warning('No Top 5 driver laptimes generated from this session')
+
+            # Tyre Compound Usage bar/pie chart
+            if compound_summary:
+                fig = px.pie(
+                compound_summary,
+                names='Compound',
+                values='TotalLaps',
+                title='Tyre Compound Distribution (Total Laps)'
+                )
+                selected = st.plotly_chart(fig, use_container_width=True)
+            else:
+                st.warning('No compound summary was generated from this session')
         except Exception as e:
             st.error(f"An error occurred: {e}")
