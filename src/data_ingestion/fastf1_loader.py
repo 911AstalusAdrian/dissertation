@@ -101,7 +101,7 @@ def get_session_tyre_distribution(season, selected_round, session_type):
     laps = session.laps
     laps['LapTimeSeconds'] = laps['LapTime'].dt.total_seconds()
     grouped_laps = laps.groupby('Compound')
-    
+
     total_laps = (
         laps.groupby('Compound')
         .size()
@@ -156,4 +156,4 @@ def get_session_tyre_distribution(season, selected_round, session_type):
     return compound_summary
 
 
-print(get_session_tyre_distribution(2025, 'Sakhir', 'Practice 1'))
+# print(get_session_tyre_distribution(2025, 'Sakhir', 'Practice 1'))
