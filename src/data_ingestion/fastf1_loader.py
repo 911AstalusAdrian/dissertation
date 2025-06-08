@@ -180,4 +180,4 @@ def get_distinct_drivers(first_season = 2018, last_season = 2025):
     return sorted(all_drivers)
 
 # print(get_session_tyre_distribution(2025, 'Sakhir', 'Practice 1'))
-print(get_distinct_drivers())
+# print(get_distinct_drivers())
