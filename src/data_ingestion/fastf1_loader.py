@@ -1,5 +1,6 @@
 # Responsible for loading the data from the FastF1 Python package
 import fastf1
+import fastf1.plotting
 import pandas as pd
 from datetime import timedelta
 
@@ -83,7 +84,6 @@ def get_kpis_from_session(season, selected_round, session_type):
         print(f'Error extracting KPIs: {e}')
         return None
 
-
 def get_session_top5_drivers_laps(season, selected_round, session_type):
     session = load_session_data(season, selected_round, session_type)
 
@@ -156,4 +156,28 @@ def get_session_tyre_distribution(season, selected_round, session_type):
     return compound_summary
 
 
+def get_distinct_drivers(first_season = 2018, last_season = 2025):
+    all_drivers = set()
+
+    for season in range(last_season, first_season - 1, -1):
+        try:
+            schedule = fastf1.get_event_schedule(season)
+        except Exception as e:
+            print(f'Skipping season {season}: {e}')
+
+        print(f'Processing season {season}...')
+
+        season_opener = fastf1.get_event(season, 1)
+        season_opener_race = season_opener.get_race()
+        season_opener_race.load()
+        drivers = season_opener_race.results['Abbreviation'].unique()
+
+        # driver clor mappings
+        # print(fastf1.plotting.get_driver_color_mapping(season_opener_race))
+
+        all_drivers.update(drivers)
+
+    return sorted(all_drivers)
+
 # print(get_session_tyre_distribution(2025, 'Sakhir', 'Practice 1'))
+print(get_distinct_drivers())
