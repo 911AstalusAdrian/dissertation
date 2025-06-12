@@ -31,22 +31,26 @@ driver = st.sidebar.selectbox("Choose Driver", options=drivers_list)  # Example 
 show_driver_button = st.sidebar.button('Show Driver Details')
 
 if show_driver_button:
-    with st.spinner(f"Loading stats for {driver}..."):
-        driver_stats = get_driver_stats(driver)
+    # with st.spinner(f"Loading stats for {driver}..."):
+    driver_stats = get_driver_stats(driver)
 
     st.header(f"Stats for {driver}")
-    col1, col2, col3 = st.columns(3)
-    col1.metric("Total Races", driver_stats['Races'])
-    col1.metric("Finished Races", driver_stats['Finished'])
-    col1.metric("DNFs", driver_stats['DNFs'])
 
-    col2.metric("Wins", driver_stats['Wins'])
-    col2.metric("Podiums", driver_stats['Podiums'])
+    profile_col1, profile_col2 = st.columns([1,3])
 
-    col3.metric("Total Points", driver_stats['Points'])
-    col3.metric("Avg Points per Race", driver_stats['Avg Points/Race'])
+    with profile_col1:
+        st.image(get_driver_photo(driver), width=150)
 
+    with profile_col2:
+        st.markdown(f'Stats for {driver}')
+        kpi_cols = st.columns(3)
+        kpi_cols[0].metric('Total Races', driver_stats['Races'])
+        kpi_cols[1].metric('Finished', driver_stats['Finished'])
+        kpi_cols[2].metric('DNFs', driver_stats['DNFs'])
 
-    # st.image(get_driver_photo(driver))
-    # load_data regarding the driver using openF1 API '/driver'
-    # make sure to modify the last name to be all caps
+        kpi_cols2 = st.column(3)
+        kpi_cols2[0].metric('Wins', driver_stats['Wins'])
+        kpi_cols2[1].metric('Podiums', driver_stats['Podiums'])
+        kpi_cols2[2].metric('Total Points', driver_stats['Points'])
+
+        st.markdown(f'Teams raced for: {driver_stats['Teams']}')
