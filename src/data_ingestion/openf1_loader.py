@@ -161,5 +161,12 @@ def get_car_data(session_key=None, driver_number=None):
     params = {"session_key": session_key, "driver_number": driver_number}
     return fetch_openf1_data("car_data", params)
 
+def get_teams_for_driver(driver_name=None):
+    params = {'full_name': driver_name}
 
-print(get_fulltime_drivers()[['full_name', 'first_name', 'last_name']])
+    driver_rows = fetch_static_data('drivers' ,params)
+    unique_teams = driver_rows.drop_duplicates(subset='team_name')
+
+    return unique_teams['team_name'].to_list()
+
+# print(get_teams_for_driver('Lewis HAMILTON'))
