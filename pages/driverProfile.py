@@ -19,7 +19,7 @@ def get_driver_stats(driver_name):
 
 @st.cache_data
 def get_driver_photo(driver_name):
-    pass
+    return get_driver_image(driver_name)
 
 drivers_list = get_drivers_data()
 seasons = list(range(2018, 2026))
@@ -47,6 +47,6 @@ if show_driver_button:
     col3.metric("Avg Points per Race", driver_stats['Avg Points/Race'])
 
 
-    st.image(driver_stats['HeadshotUrl'])
+    st.image(get_driver_photo(driver))
     # load_data regarding the driver using openF1 API '/driver'
     # make sure to modify the last name to be all caps

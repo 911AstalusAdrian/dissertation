@@ -86,6 +86,19 @@ def get_distinct_drivers(country_code=None, driver_number=None, meeting_key=None
 def get_distinct_drivers_count():
     return get_distinct_drivers()['full_name'].count()
 
+def get_driver(driver_number=None, session_key=None):
+    params = {"driver_number":driver_number, "session_key": session_key}
+    return fetch_static_data("drivers", params)
+
+def get_driver_image(full_name: str = None) -> str:
+    first_name, last_name = full_name.split(' ')
+    
+    params = {'first_name': first_name, 'last_name': last_name}
+    result = fetch_static_data('drivers', params)
+
+    return result.iloc[0]['headshot_url']
+
+
 ### Laps calls
 
 def get_laps(driver_number=None, lap_number=None, meeting_key=None, session_key=None):
@@ -111,9 +124,5 @@ def get_car_data(session_key=None, driver_number=None):
     params = {"session_key": session_key, "driver_number": driver_number}
     return fetch_openf1_data("car_data", params)
 
-def get_driver(driver_number=None, session_key=None):
-    params = {"driver_number":driver_number, "session_key": session_key}
-    return fetch_static_data("drivers", params)
 
-
-# print(get_races_per_season(season=2025))
+# print(get_driver_image('Lewis Hamilton'))
