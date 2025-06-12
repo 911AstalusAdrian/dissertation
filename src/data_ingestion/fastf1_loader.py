@@ -246,4 +246,4 @@ def get_driver_stats_multiseason(driver_full_name: str, start_year: int = 2018, 
 
 # print(get_session_tyre_distribution(2025, 'Sakhir', 'Practice 1'))
 # print(get_distinct_drivers())
-print(get_driver_stats_multiseason('Max Verstappen'))
+# print(get_driver_stats_multiseason('Max Verstappen'))
