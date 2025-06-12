@@ -176,7 +176,10 @@ def get_distinct_drivers(first_season = 2018, last_season = 2025):
 
         all_drivers = pd.concat(driver_rows).drop_duplicates(subset=['FullName', 'Abbreviation']).sort_values('FullName').reset_index(drop=True)
         all_drivers['DisplayName'] = all_drivers['FullName'] + ' (' + all_drivers['Abbreviation'] + ')'
-    return all_drivers
+    
+    
+    
+    return all_drivers['DisplayName'].tolist()
 
 # print(get_session_tyre_distribution(2025, 'Sakhir', 'Practice 1'))
 print(get_distinct_drivers())
