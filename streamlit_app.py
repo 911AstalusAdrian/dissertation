@@ -3,7 +3,7 @@ import fastf1
 
 st.set_page_config(page_title="F1 Compatibility App", layout="wide")
 
-fastf1.Cache.enable_cache(r'data\\cache')
+fastf1.Cache.enable_cache('data\cache')
 pages = [st.Page('pages/home.py', title = "Home"),
          st.Page('pages/driverProfile.py', title = 'Driver Profile'),
          st.Page('pages/compatibilityMatrix.py', title = 'Compatibility Matrix'),
