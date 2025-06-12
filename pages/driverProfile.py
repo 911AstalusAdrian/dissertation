@@ -17,7 +17,7 @@ def get_driver_stats(driver_name):
     stats = get_driver_stats_multiseason(driver_full_name=driver_name)
     return stats
 
-@st.cache_data
+# @st.cache_data
 def get_driver_photo(driver_name):
     return get_driver_image(driver_name)
 
