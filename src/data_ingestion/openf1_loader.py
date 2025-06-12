@@ -83,6 +83,37 @@ def get_distinct_drivers(country_code=None, driver_number=None, meeting_key=None
     unique_drivers = all_drivers.drop_duplicates(subset='full_name')
     return unique_drivers # returns the entire dataframe
 
+def get_fulltime_drivers():
+    unique_drivers = get_distinct_drivers()
+
+    for index, driver in unique_drivers.iterrows():
+        
+        if driver['first_name'] is None and driver['last_name'] is None:
+            if driver['full_name'] != 'Gabriel BORTOLETO':
+                print(f'Droppping {driver['full_name']}')
+                unique_drivers.drop(index, inplace=True)
+            continue
+        try:
+            composed_name = driver['first_name'] + ' ' + driver['last_name'].upper()
+
+            if driver['full_name'] != composed_name:
+
+                if driver['full_name'] == 'ZHOU Guanyu' and composed_name == 'Guanyu ZHOU':
+                    continue
+
+                # if driver['full_name'] == 'Kimi ANTONELLI' and composed_name == 'Andrea Kimi ANTONELLI':
+                #     continue
+                
+                print(f'{driver['full_name']} - {composed_name} - DROP')
+                unique_drivers.drop(index, inplace=True)
+
+        except Exception as e:
+            print(f'Error: {e}')
+            continue
+
+    unique_drivers.loc[unique_drivers.full_name == 'Gabriel BORTOLETO', ['first_name', 'last_name']] = 'Gabriel', 'Bortoleto'
+    return unique_drivers
+
 def get_distinct_drivers_count():
     return get_distinct_drivers()['full_name'].count()
 
@@ -131,4 +162,4 @@ def get_car_data(session_key=None, driver_number=None):
     return fetch_openf1_data("car_data", params)
 
 
-# print(get_distinct_drivers())
+print(get_fulltime_drivers()[['full_name', 'first_name', 'last_name']])
