@@ -90,21 +90,15 @@ def get_fulltime_drivers():
         
         if driver['first_name'] is None and driver['last_name'] is None:
             if driver['full_name'] != 'Gabriel BORTOLETO':
-                print(f'Droppping {driver['full_name']}')
                 unique_drivers.drop(index, inplace=True)
             continue
         try:
             composed_name = driver['first_name'] + ' ' + driver['last_name'].upper()
 
             if driver['full_name'] != composed_name:
-
                 if driver['full_name'] == 'ZHOU Guanyu' and composed_name == 'Guanyu ZHOU':
                     continue
-
-                # if driver['full_name'] == 'Kimi ANTONELLI' and composed_name == 'Andrea Kimi ANTONELLI':
-                #     continue
                 
-                print(f'{driver['full_name']} - {composed_name} - DROP')
                 unique_drivers.drop(index, inplace=True)
 
         except Exception as e:

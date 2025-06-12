@@ -160,7 +160,6 @@ def get_session_tyre_distribution(season, selected_round, session_type):
 
     return compound_summary
 
-
 def get_distinct_drivers(first_season = 2018, last_season = 2025):
 
     all_drivers = set()
@@ -248,6 +247,27 @@ def get_driver_stats_multiseason(driver_full_name: str, start_year: int = 2018, 
 
     return stats
 
+def get_events_for_season(season:int = 2025):
+    schedule = fastf1.get_event_schedule(season)
+
+    # cleaning the schedule (remove testing and keep only completed events for current year)
+    for index, event in schedule.iterrows():
+        if event['EventFormat'] == 'testing':
+            # print(f'Removing {event["EventName"]} - testing session')
+            schedule.drop(index, inplace=True)
+        if event['EventDate'] > datetime.today():
+            # print(f'Removing {event["EventName"]} - in the future')
+            schedule.drop(index, inplace=True)
+
+    return schedule
+
+def get_event_names_for_season(season:int = 2025):
+    schedule = get_events_for_season(season)
+    return schedule['EventName']
+
+
 # print(get_session_tyre_distribution(2025, 'Sakhir', 'Practice 1'))
 # print(get_distinct_drivers()) 
 # print(get_driver_stats_multiseason('Max Verstappen', start_year=2020, end_year=2025))
+# print(fastf1.get_event_schedule(2025)[['EventName', 'EventDate']])
+print(get_event_names_for_season(2025))

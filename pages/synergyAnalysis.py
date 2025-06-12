@@ -2,6 +2,7 @@ import streamlit as st
 import pandas as pd
 
 from src.data_ingestion.openf1_loader import get_fulltime_drivers, get_teams_for_driver
+from src.data_ingestion.fastf1_loader import get_event_names_for_season, get_events_for_season
 
 def get_list_of_drivers():
     distinct_drivers_df = get_fulltime_drivers()
@@ -11,14 +12,15 @@ def get_list_of_drivers():
 def get_driver_teams(driver_name):
     return get_teams_for_driver(driver_name)
 
-st.title("Driver-Car Synergy Analysis")
-
 st.sidebar.header("Select Inputs")
-driver = st.sidebar.selectbox("Driver", ["Max Verstappen", "Charles Leclerc", "Lewis Hamilton"])  # Replace with dynamic list
-season = st.sidebar.selectbox("Season", [2023, 2022, 2021])  # Replace with available seasons
-team = st.sidebar.selectbox("Team", ["Red Bull", "Ferrari", "Mercedes"])  # Replace with teams the driver raced for
+driver = st.sidebar.selectbox("Driver", get_list_of_drivers())
+season = st.sidebar.selectbox("Season", [2023, 2024, 2025])
+races = st.sidebar.selection('Race', get_event_names_for_season(season))
 
 if st.sidebar.button("Analyze Synergy"):
+
+    all_races = get_event_names_for_season(season)
+
     # Placeholder: compute synergy_stats, lap_time_df, position_deltas
     synergy_stats = {
         "avg_quali_pos": 3.2,
@@ -28,7 +30,7 @@ if st.sidebar.button("Analyze Synergy"):
         "delta_to_teammate": -1.2
     }
 
-    st.subheader(f"Synergy Report for {driver} with {team} ({season})")
+    # st.subheader(f"Synergy Report for {driver} ({season})")
 
     # KPI cards
     col1, col2, col3 = st.columns(3)
@@ -50,10 +52,10 @@ if st.sidebar.button("Analyze Synergy"):
     }, index=["Bahrain", "Saudi Arabia", "Australia", "Azerbaijan"]))
 
     st.subheader("Lap Time Consistency")
-    st.box_chart(pd.DataFrame({
-        "GP": ["Bahrain", "Saudi", "Australia", "Azerbaijan"],
-        "LapTime": [0.3, 0.25, 0.45, 0.4]
-    }))
+    # st.box_chart(pd.DataFrame({
+    #     "GP": ["Bahrain", "Saudi", "Australia", "Azerbaijan"],
+    #     "LapTime": [0.3, 0.25, 0.45, 0.4]
+    # }))
 
     st.subheader("Delta to Teammate per Race")
     st.bar_chart(pd.Series([-0.5, -1.0, -1.2, 0.0], index=["Bahrain", "Saudi", "Australia", "Azerbaijan"]))
