@@ -166,11 +166,12 @@ def get_distinct_drivers(first_season = 2018, last_season = 2025):
 
     for season in range(last_season, first_season - 1, -1):
         try:
-            print(f'Processing season {season}...')
             schedule = fastf1.get_event_schedule(season)
         except Exception as e:
             print(f'Skipping season {season}: {e}')
-        
+
+        print(f'Processing season {season}...')
+
         season_opener = fastf1.get_event(season, 1)
         season_opener_race = season_opener.get_race()
         season_opener_race.load(telemetry=False, weather=False, messages=False, livedata=False)
@@ -202,6 +203,7 @@ def get_driver_stats_multiseason(driver_full_name: str, start_year: int = 2018, 
             continue
 
         for _, row in schedule.iterrows():
+            print(row)
             if row['Session5'] != 'Race':
                 continue  # Only care about race sessions
 
@@ -217,9 +219,7 @@ def get_driver_stats_multiseason(driver_full_name: str, start_year: int = 2018, 
                 if driver_row.empty:
                     continue
 
-
                 dr = driver_row.iloc[0]
-
                 stats['Races'] += 1
                 stats['Points'] += dr.get('Points', 0.0) or 0.0
                 stats['Teams'].add(dr['TeamName'])
