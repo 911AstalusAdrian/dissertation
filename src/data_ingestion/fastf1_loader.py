@@ -168,14 +168,14 @@ def get_distinct_drivers(first_season = 2018, last_season = 2025):
         try:
             print(f'Processing season {season}...')
             schedule = fastf1.get_event_schedule(season)
-            season_opener = fastf1.get_event(season, 1)
-            season_opener_race = season_opener.get_race()
-            season_opener_race.load(telemetry=False, weather=False, messages=False, livedata=False)
-            drivers = season_opener_race.results['FullName']
-            all_drivers.update(drivers)
         except Exception as e:
             print(f'Skipping season {season}: {e}')
-            continue
+        
+        season_opener = fastf1.get_event(season, 1)
+        season_opener_race = season_opener.get_race()
+        season_opener_race.load(telemetry=False, weather=False, messages=False, livedata=False)
+        drivers = season_opener_race.results['FullName']
+        all_drivers.update(drivers)
 
     return sorted(all_drivers)
 
