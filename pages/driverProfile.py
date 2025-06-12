@@ -7,7 +7,7 @@ from src.data_ingestion.openf1_loader import *
 from src.data_ingestion.fastf1_loader import get_distinct_drivers
 from src.utils.df_utils import format_laptime
 
-@st.cache_data
+# @st.cache_data
 def get_drivers_data():
     drivers_list = get_distinct_drivers()
     return drivers_list
