@@ -2,6 +2,7 @@
 import fastf1
 import fastf1.plotting
 import pandas as pd
+import time
 
 from datetime import timedelta
 from datetime import datetime
@@ -186,6 +187,7 @@ def get_driver_stats_multiseason(driver_full_name: str, start_year: int = 2018, 
 
     stats = {
         'Name': driver_full_name,
+        ''
         'Races': 0,
         'Finished': 0,
         'DNFs': 0,
@@ -203,14 +205,13 @@ def get_driver_stats_multiseason(driver_full_name: str, start_year: int = 2018, 
             continue
 
         for _, row in schedule.iterrows():
-            print(row)
             if row['Session5'] != 'Race':
                 continue  # Only care about race sessions
 
             try:
-                session = fastf1.get_session(year, row['EventName'], 'R')
+                session = fastf1.get_session(year, row['EventName'], 'R', backend='fastf1')
                 session.load(telemetry=False, weather=False, messages=False, livedata=False)
-
+                # time.sleep(1)
                 results = session.results
                 if results is None or results.empty:
                     continue
@@ -239,6 +240,8 @@ def get_driver_stats_multiseason(driver_full_name: str, start_year: int = 2018, 
                 print(f"Failed to process race {row['EventName']} in {year}: {e}")
                 continue
 
+            # time.sleep(1)
+
     stats['Points'] = round(stats['Points'], 1)
     stats['Avg Points/Race'] = round(stats['Points'] / stats['Races'], 2) if stats['Races'] > 0 else 0.0
     stats['Teams'] = sorted(stats['Teams'])
@@ -247,4 +250,4 @@ def get_driver_stats_multiseason(driver_full_name: str, start_year: int = 2018, 
 
 # print(get_session_tyre_distribution(2025, 'Sakhir', 'Practice 1'))
 # print(get_distinct_drivers()) 
-# print(get_driver_stats_multiseason('Max Verstappen'))
+# print(get_driver_stats_multiseason('Charles Leclerc'))
