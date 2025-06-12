@@ -17,7 +17,7 @@ def get_drivers_list(driver_data: pd.DataFrame):
 
 
 drivers_data = get_drivers_data()
-drivers_list = get_drivers_list(drivers_data)
+# drivers_list = get_drivers_list(drivers_data)
 
 seasons = list(range(2018, 2026))
 # --- Layout ---
@@ -25,7 +25,7 @@ st.title("Driver Profile")
 
 # --- Sidebar Filters ---
 st.sidebar.header("Driver Selector")
-driver = st.sidebar.selectbox("Choose Driver", options=drivers_list)  # Example list
+driver = st.sidebar.selectbox("Choose Driver", options=drivers_data)  # Example list
 
 
 ## not in the sidebar, make them choices similar to the homepage
