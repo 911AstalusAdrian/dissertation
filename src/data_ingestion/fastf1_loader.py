@@ -2,7 +2,9 @@
 import fastf1
 import fastf1.plotting
 import pandas as pd
+
 from datetime import timedelta
+from datetime import datetime
 
 def format_laptime(td:timedelta) -> str:
 
@@ -158,6 +160,8 @@ def get_session_tyre_distribution(season, selected_round, session_type):
 
 def get_distinct_drivers(first_season = 2018, last_season = 2025):
 
+    all_drivers = set()
+
     for season in range(last_season, first_season - 1, -1):
         try:
             schedule = fastf1.get_event_schedule(season)
@@ -169,8 +173,77 @@ def get_distinct_drivers(first_season = 2018, last_season = 2025):
         season_opener = fastf1.get_event(season, 1)
         season_opener_race = season_opener.get_race()
         season_opener_race.load(telemetry=False, weather=False, messages=False, livedata=False)
-        drivers = season_opener_race.results['FullName'].unique()
+        drivers = season_opener_race.results['FullName']
+        all_drivers.update(drivers)
 
-    return drivers
+    return sorted(all_drivers)
+
+def get_driver_stats_multiseason(driver_full_name: str, start_year: int = 2018, end_year: int = None) -> dict:
+    if end_year is None:
+        end_year = datetime.now().year
+
+    stats = {
+        'Name': driver_full_name,
+        'Races': 0,
+        'Finished': 0,
+        'DNFs': 0,
+        'Wins': 0,
+        'Podiums': 0,
+        'Points': 0.0,
+        'Teams': set()
+    }
+
+    for year in range(start_year, end_year + 1):
+        try:
+            schedule = fastf1.get_event_schedule(year)
+        except Exception as e:
+            print(f"Skipping year {year}: {e}")
+            continue
+
+        for _, row in schedule.iterrows():
+            print(row)
+            if row['Session5'] != 'Race':
+                continue  # Only care about race sessions
+
+            try:
+                session = fastf1.get_session(year, row['EventName'], 'R')
+                session.load(telemetry=False, weather=False, messages=False, livedata=False)
+
+                results = session.results
+                if results is None or results.empty:
+                    continue
+
+                driver_row = results[results['FullName'] == driver_full_name]
+                if driver_row.empty:
+                    continue
+
+                dr = driver_row.iloc[0]
+                stats['Races'] += 1
+                stats['Points'] += dr.get('Points', 0.0) or 0.0
+                stats['Teams'].add(dr['TeamName'])
+
+                if isinstance(dr['Status'], str) and 'Finished' in dr['Status']:
+                    stats['Finished'] += 1
+                else:
+                    stats['DNFs'] += 1
+
+                if dr['Position'] == 1:
+                    stats['Wins'] += 1
+                    stats['Podiums'] += 1
+                elif dr['Position'] in [2, 3]:
+                    stats['Podiums'] += 1
+
+            except Exception as e:
+                print(f"Failed to process race {row['EventName']} in {year}: {e}")
+                continue
+
+    stats['Points'] = round(stats['Points'], 1)
+    stats['Avg Points/Race'] = round(stats['Points'] / stats['Races'], 2) if stats['Races'] > 0 else 0.0
+    stats['Teams'] = sorted(stats['Teams'])
+
+    return stats
+
+
 # print(get_session_tyre_distribution(2025, 'Sakhir', 'Practice 1'))
 # print(get_distinct_drivers())
+print(get_driver_stats_multiseason('Max Verstappen'))
