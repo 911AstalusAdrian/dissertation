@@ -187,7 +187,7 @@ def get_driver_stats_multiseason(driver_full_name: str, start_year: int = 2018, 
 
     stats = {
         'Name': driver_full_name,
-        ''
+        'HeadshotUrl': None,
         'Races': 0,
         'Finished': 0,
         'DNFs': 0,
@@ -211,7 +211,7 @@ def get_driver_stats_multiseason(driver_full_name: str, start_year: int = 2018, 
             try:
                 session = fastf1.get_session(year, row['EventName'], 'R', backend='fastf1')
                 session.load(telemetry=False, weather=False, messages=False, livedata=False)
-                # time.sleep(1)
+                time.sleep(1)
                 results = session.results
                 if results is None or results.empty:
                     continue
@@ -221,6 +221,10 @@ def get_driver_stats_multiseason(driver_full_name: str, start_year: int = 2018, 
                     continue
 
                 dr = driver_row.iloc[0]
+
+                if stats['HeadshotUrl'] is None:
+                    stats['HeadshotUrl'] = dr['HeadshotUrl']
+
                 stats['Races'] += 1
                 stats['Points'] += dr.get('Points', 0.0) or 0.0
                 stats['Teams'].add(dr['TeamName'])
@@ -250,4 +254,4 @@ def get_driver_stats_multiseason(driver_full_name: str, start_year: int = 2018, 
 
 # print(get_session_tyre_distribution(2025, 'Sakhir', 'Practice 1'))
 # print(get_distinct_drivers()) 
-# print(get_driver_stats_multiseason('Charles Leclerc'))
+print(get_driver_stats_multiseason('Alex Albon'))

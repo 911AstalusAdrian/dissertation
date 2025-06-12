@@ -45,5 +45,8 @@ if show_driver_button:
 
     col3.metric("Total Points", driver_stats['Points'])
     col3.metric("Avg Points per Race", driver_stats['Avg Points/Race'])
+
+
+    st.image(driver_stats['HeadshotUrl'])
     # load_data regarding the driver using openF1 API '/driver'
     # make sure to modify the last name to be all caps
