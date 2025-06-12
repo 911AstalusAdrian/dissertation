@@ -3,7 +3,6 @@ import pandas as pd
 import plotly.express as px
 
 from datetime import timedelta
-from src.data_ingestion.openf1_loader import *
 from src.data_ingestion.fastf1_loader import get_distinct_drivers, get_driver_stats_multiseason
 from src.utils.df_utils import format_laptime
 
