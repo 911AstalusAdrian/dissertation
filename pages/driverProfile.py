@@ -7,6 +7,9 @@ from src.data_ingestion.openf1_loader import *
 from src.data_ingestion.fastf1_loader import get_distinct_drivers, get_driver_stats_multiseason
 from src.utils.df_utils import format_laptime
 
+st.cache_data.clear()
+
+
 @st.cache_data
 def get_drivers_data():
     drivers_list = get_distinct_drivers()
@@ -45,5 +48,6 @@ if show_driver_button:
 
     col3.metric("Total Points", driver_stats['Points'])
     col3.metric("Avg Points per Race", driver_stats['Avg Points/Race'])
+    col3.metric('Headshot URL', driver_stats['HeadshotUrl'])
     # load_data regarding the driver using openF1 API '/driver'
     # make sure to modify the last name to be all caps

@@ -184,6 +184,7 @@ def get_driver_stats_multiseason(driver_full_name: str, start_year: int = 2018, 
 
     stats = {
         'Name': driver_full_name,
+        'HeadshotUrl': None,
         'Races': 0,
         'Finished': 0,
         'DNFs': 0,
@@ -201,7 +202,6 @@ def get_driver_stats_multiseason(driver_full_name: str, start_year: int = 2018, 
             continue
 
         for _, row in schedule.iterrows():
-            print(row)
             if row['Session5'] != 'Race':
                 continue  # Only care about race sessions
 
@@ -217,7 +217,12 @@ def get_driver_stats_multiseason(driver_full_name: str, start_year: int = 2018, 
                 if driver_row.empty:
                     continue
 
+
                 dr = driver_row.iloc[0]
+
+                if stats['HeadshotUrl'] is None:
+                    stats['HeadshotURL'] = dr['HeadshotUrl']
+
                 stats['Races'] += 1
                 stats['Points'] += dr.get('Points', 0.0) or 0.0
                 stats['Teams'].add(dr['TeamName'])
@@ -246,4 +251,4 @@ def get_driver_stats_multiseason(driver_full_name: str, start_year: int = 2018, 
 
 # print(get_session_tyre_distribution(2025, 'Sakhir', 'Practice 1'))
 # print(get_distinct_drivers())
-# print(get_driver_stats_multiseason('Max Verstappen'))
+print(get_driver_stats_multiseason('Max Verstappen'))
