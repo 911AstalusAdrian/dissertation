@@ -183,7 +183,6 @@ def get_driver_stats_multiseason(driver_full_name: str, start_year: int = 2018, 
 
     stats = {
         'Name': driver_full_name,
-        'HeadshotUrl': None,
         'Races': 0,
         'Finished': 0,
         'DNFs': 0,
@@ -218,9 +217,6 @@ def get_driver_stats_multiseason(driver_full_name: str, start_year: int = 2018, 
 
 
                 dr = driver_row.iloc[0]
-
-                if stats['HeadshotUrl'] is None:
-                    stats['HeadshotURL'] = dr['HeadshotUrl']
 
                 stats['Races'] += 1
                 stats['Points'] += dr.get('Points', 0.0) or 0.0
