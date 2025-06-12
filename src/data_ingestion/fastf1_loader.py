@@ -6,7 +6,7 @@ import pandas as pd
 from datetime import timedelta
 from datetime import datetime
 
-fastf1.Cache.enable_cache(r'data\\cache')
+
 
 def format_laptime(td:timedelta) -> str:
 
@@ -245,6 +245,6 @@ def get_driver_stats_multiseason(driver_full_name: str, start_year: int = 2018, 
 
     return stats
 
-print(get_session_tyre_distribution(2025, 'Sakhir', 'Practice 1'))
+# print(get_session_tyre_distribution(2025, 'Sakhir', 'Practice 1'))
 # print(get_distinct_drivers()) 
 # print(get_driver_stats_multiseason('Max Verstappen'))
