@@ -157,7 +157,6 @@ def get_session_tyre_distribution(season, selected_round, session_type):
 
 
 def get_distinct_drivers(first_season = 2018, last_season = 2025):
-    driver_rows = []
 
     for season in range(last_season, first_season - 1, -1):
         try:
@@ -170,16 +169,8 @@ def get_distinct_drivers(first_season = 2018, last_season = 2025):
         season_opener = fastf1.get_event(season, 1)
         season_opener_race = season_opener.get_race()
         season_opener_race.load(telemetry=False, weather=False, messages=False, livedata=False)
-        drivers = season_opener_race.results[['Abbreviation', 'FullName', 'HeadshotUrl']]
-        driver_rows.append(drivers)
+        drivers = season_opener_race.results['FullName'].unique()
 
-
-        all_drivers = pd.concat(driver_rows).drop_duplicates(subset=['FullName', 'Abbreviation']).sort_values('FullName').reset_index(drop=True)
-        all_drivers['DisplayName'] = all_drivers['FullName'] + ' (' + all_drivers['Abbreviation'] + ')'
-    
-    
-    
-    return all_drivers['FullName']
-
+    return drivers
 # print(get_session_tyre_distribution(2025, 'Sakhir', 'Practice 1'))
 # print(get_distinct_drivers())
