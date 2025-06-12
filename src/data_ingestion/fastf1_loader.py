@@ -270,4 +270,4 @@ def get_event_names_for_season(season:int = 2025):
 # print(get_distinct_drivers()) 
 # print(get_driver_stats_multiseason('Max Verstappen', start_year=2020, end_year=2025))
 # print(fastf1.get_event_schedule(2025)[['EventName', 'EventDate']])
-print(get_event_names_for_season(2025))
+# print(get_event_names_for_season(2025))
