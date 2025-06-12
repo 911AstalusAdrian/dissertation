@@ -81,7 +81,7 @@ def get_distinct_drivers(country_code=None, driver_number=None, meeting_key=None
               'team_name': team_name}
     all_drivers =  fetch_static_data('drivers', params)
     unique_drivers = all_drivers.drop_duplicates(subset='full_name')
-    return unique_drivers
+    return unique_drivers # returns the entire dataframe
 
 def get_distinct_drivers_count():
     return get_distinct_drivers()['full_name'].count()
@@ -131,4 +131,4 @@ def get_car_data(session_key=None, driver_number=None):
     return fetch_openf1_data("car_data", params)
 
 
-# print(get_driver_image('Lewis Hamilton'))
+# print(get_distinct_drivers())
