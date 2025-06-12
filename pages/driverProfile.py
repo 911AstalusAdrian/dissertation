@@ -48,7 +48,7 @@ if show_driver_button:
         kpi_cols[1].metric('Finished', driver_stats['Finished'])
         kpi_cols[2].metric('DNFs', driver_stats['DNFs'])
 
-        kpi_cols2 = st.column(3)
+        kpi_cols2 = st.columns(3)
         kpi_cols2[0].metric('Wins', driver_stats['Wins'])
         kpi_cols2[1].metric('Podiums', driver_stats['Podiums'])
         kpi_cols2[2].metric('Total Points', driver_stats['Points'])

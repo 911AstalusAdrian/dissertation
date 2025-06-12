@@ -91,6 +91,12 @@ def get_driver(driver_number=None, session_key=None):
     return fetch_static_data("drivers", params)
 
 def get_driver_image(full_name: str = None) -> str:
+
+    # add try catch block for drivers without picture
+    # cases: 1. API call returns nothing ( [] )
+    #        2. The headshot_url is not availavble at all
+    #        3. The headshot_url is not available on the first api response JSON
+
     first_name, last_name = full_name.split(' ')
     
     params = {'first_name': first_name, 'last_name': last_name}
