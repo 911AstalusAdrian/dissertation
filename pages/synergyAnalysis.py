@@ -15,7 +15,7 @@ def get_driver_teams(driver_name):
 st.sidebar.header("Select Inputs")
 driver = st.sidebar.selectbox("Driver", get_list_of_drivers())
 season = st.sidebar.selectbox("Season", [2023, 2024, 2025])
-races = st.sidebar.selection('Race', get_event_names_for_season(season))
+races = st.sidebar.selectbox('Race', get_event_names_for_season(season))
 
 if st.sidebar.button("Analyze Synergy"):
 
