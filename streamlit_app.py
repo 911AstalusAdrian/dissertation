@@ -1,8 +1,5 @@
 import streamlit as st
-import fastf1
-from src.utils.cache import load_schedule
 
-# load_schedule()
 st.set_page_config(page_title="F1 Compatibility App", layout="wide")
 
 pages = [st.Page('pages/home.py', title = "Home"),
