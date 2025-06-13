@@ -467,6 +467,7 @@ def get_driver_full_info(driver:str = None, starting_season:int = 2018, last_sea
         except Exception as e:
             print(f'Failed to get schedule for year {year}')
         for _, event in schedule.iterrows():
+            print(f'{year} - {event['EventName']}')
             # Skip over testing sessions
             if event['EventFormat'] == 'testing':
                 continue
@@ -529,6 +530,9 @@ def get_driver_full_info(driver:str = None, starting_season:int = 2018, last_sea
 
             # Get the result of the teammate
             teammate_race_result = race_results.loc[(race_results['TeamId'] == team_id) & (race_results['FullName'] != driver)]
+            if teammate_race_result.empty:
+                print('Teammate did not participate in the race')
+                continue
             teammate_race_result = teammate_race_result.iloc[0]
 
             # Compute race position delta
@@ -545,10 +549,16 @@ def get_driver_full_info(driver:str = None, starting_season:int = 2018, last_sea
 
             # Get driver quali result
             driver_quali_result = quali_results.loc[quali_results['FullName'] == driver]
+            if driver_quali_result.empty:
+                print('Driver did not participate in this Quali, but raced')
+                continue
             driver_quali_result = driver_quali_result.iloc[0]
 
             # Get teammate quali result
             teammate_quali_result = quali_results.loc[(quali_results['TeamId'] == team_id) & (quali_results['FullName'] != driver)]
+            if teammate_quali_result.empty:
+                print('Teammate did not participate in this Quali, but raced')
+                continue
             teammate_quali_result = teammate_quali_result.iloc[0]
 
             # Calculate quali delta
@@ -581,7 +591,7 @@ def get_driver_full_info(driver:str = None, starting_season:int = 2018, last_sea
 
 
 
-print(get_driver_full_info('Alexander Albon', 2025, 2025))
+print(get_driver_full_info('Alexander Albon', 2018, 2025))
 # print(get_race_results_over_seasons('Alexander Albon', 2025, 2025))
 
 # {
