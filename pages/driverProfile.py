@@ -112,9 +112,10 @@ def plot_h2h(df):
 
 def plot_h2h_summary(h2h_analysis):
     df = h2h_analysis.copy()
+    all_seasons = df['Season'].tolist()
     df['Season'] = df['Season'].astype(str)
 
-    # --- Qualifying Bar Chart ---
+    # Qualifying Bar Chart
     fig_quali = go.Figure()
     fig_quali.add_trace(go.Bar(
         x=df['Season'],
@@ -131,12 +132,18 @@ def plot_h2h_summary(h2h_analysis):
     fig_quali.update_layout(
         barmode='group',
         title='Qualifying Head-to-Head Summary',
+        xaxis=dict(
+            title='Season',
+            tickmode='array',
+            tickvals=all_seasons,
+            ticktext=all_seasons
+        ),
         xaxis_title='Season',
         yaxis_title='Count',
         legend_title='Category'
     )
 
-    # --- Race Bar Chart ---
+    # Race Bar Chart
     fig_race = go.Figure()
     fig_race.add_trace(go.Bar(
         x=df['Season'],
@@ -153,6 +160,12 @@ def plot_h2h_summary(h2h_analysis):
     fig_race.update_layout(
         barmode='group',
         title='Race Head-to-Head Summary',
+        xaxis=dict(
+            title='Season',
+            tickmode='array',
+            tickvals=all_seasons,
+            ticktext=all_seasons
+        ),
         xaxis_title='Season',
         yaxis_title='Count',
         legend_title='Category'
