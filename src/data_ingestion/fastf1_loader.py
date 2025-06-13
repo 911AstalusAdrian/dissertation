@@ -591,7 +591,7 @@ def get_driver_full_info(driver:str = None, starting_season:int = 2018, last_sea
 
 
 
-print(get_driver_full_info('Alexander Albon', 2018, 2025))
+# print(get_driver_full_info('Alexander Albon', 2018, 2025))
 # print(get_race_results_over_seasons('Alexander Albon', 2025, 2025))
 
 # {
