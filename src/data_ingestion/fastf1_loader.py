@@ -265,9 +265,63 @@ def get_event_names_for_season(season:int = 2025):
     schedule = get_events_for_season(season)
     return schedule['EventName']
 
+def get_average_quali_pos(driver:str = None, season:int = 2025, season_races:list = []):
+    
+    quali_results_for_driver = []
 
-# print(get_session_tyre_distribution(2025, 'Sakhir', 'Practice 1'))
-# print(get_distinct_drivers()) 
-# print(get_driver_stats_multiseason('Max Verstappen', start_year=2020, end_year=2025))
-# print(fastf1.get_event_schedule(2025)[['EventName', 'EventDate']])
-# print(get_event_names_for_season(2025))
+    for race in season_races:
+
+        # Load quali session
+        quali = fastf1.get_session(season, race, 'Q')
+        quali.load()
+        
+        quali_results = quali.results
+        for index, row in quali_results.iterrows():
+            if row['FullName'].lower() == driver.lower():
+                quali_results_for_driver.append(row['Position'])
+
+    return sum(quali_results_for_driver) / len(quali_results_for_driver)
+                
+def get_race_results_over_seasons(driver:str = None, starting_season:int = 2018, last_season:int = 2025):
+
+    driver_results = []
+
+    for year in range(starting_season, last_season + 1):
+        schedule = get_events_for_season(year)
+        for _, event in schedule.iterrows():
+            try:
+                # Get and Load race results
+                race = event.get_race()
+                race.load(laps=False, telemetry=False, weather=False, messages=False, livedata=False)
+                race_results = race.results
+
+                # Error handling in case results is empty
+                if race_results is None or race_results.empty:
+                    continue
+
+                # Get race result for a specific driver + error handling
+                driver_result = race_results.loc[race_results['FullName'] == driver]
+                if driver_result is None or driver_result.empty:
+                    continue
+
+                driver_results.append({
+                    'Season': year,
+                    'RaceName': event['EventName'],
+                    'FullName': driver_result['FullName'],
+                    'TeamName': driver_result['TeamName'],
+                    'Position': driver_result['Position'],
+                    'Points': driver_result['Points']
+                })
+            except Exception as e:
+                print(f'Error in {event['EventName']} - {year}: {e}')
+                continue
+
+
+    driver_results_df = pd.DataFrame(driver_results)
+    return driver_results_df
+
+
+# races = get_event_names_for_season(2025)
+# print(get_average_quali_pos('Max VERSTAPPEN', 2025, races))
+
+print(get_race_results_over_seasons('Oscar Piastri', 2025, 2025))

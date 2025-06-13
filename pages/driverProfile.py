@@ -4,7 +4,7 @@ import plotly.express as px
 
 from datetime import timedelta
 from src.data_ingestion.openf1_loader import get_driver_image
-from src.data_ingestion.fastf1_loader import get_distinct_drivers, get_driver_stats_multiseason
+from src.data_ingestion.fastf1_loader import get_distinct_drivers, get_driver_stats_multiseason, get_race_results_over_seasons
 from src.utils.df_utils import format_laptime
 
 @st.cache_data
@@ -17,7 +17,12 @@ def get_driver_stats(driver_name):
     stats = get_driver_stats_multiseason(driver_full_name=driver_name)
     return stats
 
-# @st.cache_data
+@st.cache_data
+def get_driver_results(driver_name):
+    results = get_race_results_over_seasons(driver_name)
+    return results
+
+@st.cache_data
 def get_driver_photo(driver_name):
     return get_driver_image(driver_name)
 
@@ -33,6 +38,9 @@ show_driver_button = st.sidebar.button('Show Driver Details')
 if show_driver_button:
     # with st.spinner(f"Loading stats for {driver}..."):
     driver_stats = get_driver_stats(driver)
+    driver_results = get_driver_results(driver)
+
+    st.dataframe(driver_results)
 
     st.header(f"Stats for {driver}")
 

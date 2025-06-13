@@ -2,7 +2,7 @@ import streamlit as st
 import pandas as pd
 
 from src.data_ingestion.openf1_loader import get_fulltime_drivers, get_teams_for_driver
-from src.data_ingestion.fastf1_loader import get_event_names_for_season, get_events_for_season
+from src.data_ingestion.fastf1_loader import get_event_names_for_season, get_average_quali_pos
 
 def get_list_of_drivers():
     distinct_drivers_df = get_fulltime_drivers()
@@ -19,7 +19,17 @@ races = st.sidebar.selectbox('Race', get_event_names_for_season(season))
 
 if st.sidebar.button("Analyze Synergy"):
 
-    all_races = get_event_names_for_season(season)
+    season_races = get_event_names_for_season(season)
+    average_quali_pos = get_average_quali_pos(driver, season, season_races)
+
+
+
+    # average quali position
+    # average finish position
+    # dnf rate
+    # lap standard deviation
+    # delta to teammate
+    
 
     # Placeholder: compute synergy_stats, lap_time_df, position_deltas
     synergy_stats = {
