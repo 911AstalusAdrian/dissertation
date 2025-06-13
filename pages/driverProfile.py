@@ -98,7 +98,7 @@ def plot_h2h(driver_name):
         mode='lines',
         name='Baseline (0s)',
         line=dict(color='red', dash='dash'),
-        showlegend=True
+        showlegend=False
     ))
 
     fig.update_layout(
