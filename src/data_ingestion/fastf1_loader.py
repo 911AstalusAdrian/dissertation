@@ -1,4 +1,6 @@
 # Responsible for loading the data from the FastF1 Python package
+from src.utils.cache import *
+
 import fastf1
 import pandas as pd
 import numpy as np
@@ -6,6 +8,7 @@ import time
 
 from datetime import timedelta
 from datetime import datetime
+
 
 
 
@@ -197,7 +200,7 @@ def get_driver_stats_multiseason(driver_full_name: str, start_year: int = 2018, 
 
     for year in range(start_year, end_year + 1):
         try:
-            schedule = fastf1.get_event_schedule(year)
+            schedule = get_schedule_for_year(year)
         except Exception as e:
             print(f"Skipping year {year}: {e}")
             continue
@@ -248,7 +251,7 @@ def get_driver_stats_multiseason(driver_full_name: str, start_year: int = 2018, 
     return stats
 
 def get_events_for_season(season:int = 2025):
-    schedule = fastf1.get_event_schedule(season)
+    schedule = get_schedule_for_year(season)
     # cleaning the schedule (remove testing and keep only completed events for current year)
     for index, event in schedule.iterrows():
         if event['EventFormat'] == 'testing':
@@ -431,7 +434,7 @@ def get_driver_teammate_comparison_over_seasons(driver:str = None, starting_seas
 # races = get_event_names_for_season(2025)
 # print(get_average_quali_pos('Max VERSTAPPEN', 2025, races))
 # print(get_race_results_over_seasons('Oscar Piastri', 2025, 2025))
-# print(get_driver_teammate_comparison_over_seasons('Alexander Albon', 2018, 2025))
+print(get_driver_teammate_comparison_over_seasons('Alexander Albon', 2018, 2025))
 
 
 # for i in range(2018, 2025):
