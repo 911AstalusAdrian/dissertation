@@ -262,8 +262,9 @@ def get_driver_stats_multiseason(driver_full_name: str, start_year: int = 2018, 
     return stats
 
 def get_events_for_season(season:int = 2025):
-    schedule = fastf1.get_event_schedule(season)
-    # schedule = SCHEDULE_CACHE.get(season)
+    schedule = SCHEDULE_CACHE.get(season)
+    if schedule is None:
+        schedule = fastf1.get_event_schedule(season)
     # cleaning the schedule (remove testing and keep only completed events for current year)
     for index, event in schedule.iterrows():
         if event['EventFormat'] == 'testing':
