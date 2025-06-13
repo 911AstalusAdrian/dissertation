@@ -14,6 +14,7 @@ with cols[0]:
 with cols[1]:
     season = st.selectbox("Season", [2023, 2024, 2025])
 with cols[2]:
+    st.markdown('')
     analyse_synergy = st.button("Analyze Synergy")
 
 if analyse_synergy:
