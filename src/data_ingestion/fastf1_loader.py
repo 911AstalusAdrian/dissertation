@@ -643,5 +643,5 @@ def get_synergy_metrics(driver:str = None, season:int = 2025):
 
     return synergy_results
 
-metrics = get_synergy_metrics('Alexander Albon', 2023)
-print(metrics.get('R_positions'))
+# metrics = get_synergy_metrics('Alexander Albon', 2023)
+# print(metrics.get('R_positions'))
