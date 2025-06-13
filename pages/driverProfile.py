@@ -37,7 +37,7 @@ show_driver_button = st.sidebar.button('Show Driver Details')
 
 if show_driver_button:
     # with st.spinner(f"Loading stats for {driver}..."):
-    driver_stats = get_driver_stats(driver)
+    # driver_stats = get_driver_stats(driver)
     driver_results = get_driver_results(driver)
 
     st.dataframe(driver_results)
