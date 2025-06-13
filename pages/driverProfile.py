@@ -55,7 +55,7 @@ def plot_driver_results(driver_name):
             prev_team = current_team
         
         segment_x.append(row['RaceIndex'])
-        segment_y.append(row['InvPos'])
+        segment_y.append(row['Position'])
 
     if segment_x:
         ax.plot(segment_x, segment_y, color = TEAM_COLORS.get(prev_team, '#888888'),
