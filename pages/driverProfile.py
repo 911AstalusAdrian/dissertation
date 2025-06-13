@@ -1,12 +1,8 @@
 import streamlit as st
-import pandas as pd
-import plotly.express as px
 import matplotlib.pyplot as plt
 
-from datetime import timedelta
 from src.data_ingestion.openf1_loader import get_driver_image
 from src.data_ingestion.fastf1_loader import get_events_for_season, get_distinct_drivers, get_driver_stats_multiseason, get_race_results_over_seasons, get_driver_teammate_comparison_over_seasons
-from src.utils.df_utils import format_laptime
 from src.utils.plot_utils import TEAM_COLORS
 
 @st.cache_data
@@ -112,6 +108,8 @@ if show_driver_button:
     #     st.markdown(f'Teams raced for: {driver_stats['Teams']}')
 
     # plot_driver_results(driver)
+
+
     h2h_analysis = get_driver_comparisons(driver)
     st.dataframe(h2h_analysis)
     # quali_delta = h2h_analysis[['Season', 'QualiDelta']]
