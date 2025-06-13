@@ -1,7 +1,7 @@
 # Responsible for loading the data from the FastF1 Python package
 import fastf1
-import fastf1.plotting
 import pandas as pd
+import numpy as np
 import time
 
 from datetime import timedelta
@@ -321,8 +321,114 @@ def get_race_results_over_seasons(driver:str = None, starting_season:int = 2018,
     driver_results_df = pd.DataFrame(driver_results)
     return driver_results_df
 
+def calculate_quali_teammate_delta(driver_res, teammate_res):
+    if not pd.notna(driver_res['Q3']):
+        if not pd.notna(driver_res['Q2']):
+            if not pd.notna(driver_res['Q1']):
+                driver_best_time = 0
+            else: 
+                driver_best_time = driver_res['Q1']
+        else:
+            driver_best_time = driver_res['Q2']
+    else:
+        driver_best_time = driver_res['Q3']
+
+    if not pd.notna(teammate_res['Q3']):
+        if not pd.notna(teammate_res['Q2']):
+            if not pd.notna(teammate_res['Q1']):
+                teammate_best_time = 0
+            else:
+                teammate_best_time = teammate_res['Q1']
+        else:
+            teammate_best_time = teammate_res['Q2']
+    else:
+        teammate_best_time = teammate_res['Q3']
+
+    if driver_best_time == 0 or teammate_best_time == 0:
+        delta = timedelta(seconds=0)
+    else:
+        delta = driver_best_time - teammate_best_time
+    # print(f'{delta_seconds:.3f}')
+    delta_seconds = delta.total_seconds()
+
+    if abs(delta_seconds ) > 5: return 0.0
+    return delta_seconds
+
+def calculate_race_teammate_h2h(driver_res, teammate_res):
+    return driver_res['Position'] - teammate_res['Position']
+
+
+def get_driver_teammate_comparison_over_seasons(driver:str = None, starting_season:int = 2018, last_season:int = 2025):
+
+    teammate_comparisons = []
+
+    for year in range(starting_season, last_season + 1):
+        quali_count = 0
+        quali_delta = 0
+        quali_for = 0
+        quali_against = 0
+        race_for = 0
+        race_against = 0
+        sessions = get_events_for_season(year)
+        for _, session in sessions.iterrows():
+
+            try:
+                # Race H2H calculations
+                race = session.get_race()
+                race.load(laps=False, telemetry=False, weather=False, messages=False, livedata=False)
+                race_results = race.results
+
+                driver_race_res = race_results.loc[race_results['FullName'] == driver]
+                driver_race_res = driver_race_res.iloc[0]
+
+                team_name = driver_race_res['TeamId']
+                
+                teammate_race_res = race_results.loc[(race_results['TeamId'] == team_name) & (race_results['FullName'] != driver)]
+                teammate_race_res = teammate_race_res.iloc[0]
+
+                teammate_pos_diff = calculate_race_teammate_h2h(driver_race_res, teammate_race_res)
+                if teammate_pos_diff < 0: race_for += 1
+                else: race_against += 1
+
+                time.sleep(0.5)
+
+                # Qualifying H2H calculations
+                quali = session.get_qualifying()
+                quali.load(laps=False, telemetry=False, weather=False, messages=False, livedata=False)
+                quali_results = quali.results
+
+                driver_quali_res = quali_results.loc[quali_results['FullName'] == driver]
+                driver_quali_res = driver_quali_res.iloc[0]
+
+                teammate_quali_res = quali_results.loc[(quali_results['TeamId'] == team_name) & (quali_results['FullName'] != driver)]
+                teammate_quali_res = teammate_quali_res.iloc[0]
+
+                # Not taking into consideration weather changes during Quali (ex: Canada 2023)
+                # For differences in delta > 5 we mark them with 0 (invalid quali)
+                teammate_delta = calculate_quali_teammate_delta(driver_quali_res, teammate_quali_res)
+                if teammate_delta != timedelta(seconds=0).total_seconds():
+                    if teammate_delta > pd.Timedelta(0).total_seconds(): quali_against += 1
+                    else: quali_for += 1
+                    quali_count += 1
+                    quali_delta += teammate_delta
+
+            except Exception as e:
+                print(f'ERROR! {repr(e)}')
+                time.sleep(2)
+                continue
+
+        teammate_comparisons.append({
+            'Season': year,
+            'QualiDelta': quali_delta / quali_count,
+            'QualiFor': quali_for,
+            'QualiAgainst': quali_against,
+            'RaceFor': race_for,
+            'RaceAgainst': race_against
+        })
+    return teammate_comparisons
 
 # races = get_event_names_for_season(2025)
 # print(get_average_quali_pos('Max VERSTAPPEN', 2025, races))
-
 # print(get_race_results_over_seasons('Oscar Piastri', 2025, 2025))
+print(get_driver_teammate_comparison_over_seasons('Max Verstappen', 2018, 2025))
+
