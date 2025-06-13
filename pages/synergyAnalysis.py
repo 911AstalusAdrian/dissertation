@@ -6,8 +6,10 @@ import pandas as pd
 
 from src.data_ingestion.openf1_loader import get_recent_drivers
 
+@st.cache_data(show_spinner='Loading list of recent drivers...')
 def get_latest_drivers():
     recent_drivers_list = get_recent_drivers()
+    return list(recent_drivers_list)
 
 # def get_driver_teams(driver_name):
 #     return get_teams_for_driver(driver_name)
