@@ -75,9 +75,8 @@ def plot_driver_results(driver_name):
 
     st.pyplot(fig)
 
-def plot_h2h(driver_name):
-    h2h_analysis = get_driver_comparisons(driver_name)
-    quali_delta = h2h_analysis[['Season', 'QualiDelta']]
+def plot_h2h(df):
+    quali_delta = df[['Season', 'QualiDelta']]
     quali_delta['Season'] = quali_delta['Season'].astype(str)
     fig = go.Figure()
 
@@ -111,6 +110,58 @@ def plot_h2h(driver_name):
 
     st.plotly_chart(fig, use_container_width=True)
 
+def plot_h2h_summary(h2h_analysis):
+    df = h2h_analysis.copy()
+    df['Season'] = df['Season'].astype(str)
+
+    # --- Qualifying Bar Chart ---
+    fig_quali = go.Figure()
+    fig_quali.add_trace(go.Bar(
+        x=df['Season'],
+        y=df['QualiFor'],
+        name='Quali Wins',
+        marker_color='green'
+    ))
+    fig_quali.add_trace(go.Bar(
+        x=df['Season'],
+        y=df['QualiAgainst'],
+        name='Quali Losses',
+        marker_color='red'
+    ))
+    fig_quali.update_layout(
+        barmode='group',
+        title='Qualifying Head-to-Head Summary',
+        xaxis_title='Season',
+        yaxis_title='Count',
+        legend_title='Category'
+    )
+
+    # --- Race Bar Chart ---
+    fig_race = go.Figure()
+    fig_race.add_trace(go.Bar(
+        x=df['Season'],
+        y=df['RaceFor'],
+        name='Race Wins',
+        marker_color='blue'
+    ))
+    fig_race.add_trace(go.Bar(
+        x=df['Season'],
+        y=df['RaceAgainst'],
+        name='Race Losses',
+        marker_color='orange'
+    ))
+    fig_race.update_layout(
+        barmode='group',
+        title='Race Head-to-Head Summary',
+        xaxis_title='Season',
+        yaxis_title='Count',
+        legend_title='Category'
+    )
+
+    st.plotly_chart(fig_quali, use_container_width=True)
+    st.plotly_chart(fig_race, use_container_width=True)
+    
+
 drivers_list = get_drivers_data()
 seasons = list(range(2018, 2026))
 
@@ -143,4 +194,6 @@ if show_driver_button:
     #     st.markdown(f'Teams raced for: {driver_stats['Teams']}')
 
     # plot_driver_results(driver)
-    plot_h2h(driver)
+    h2h_analysis = get_driver_comparisons(driver)
+    plot_h2h(h2h_analysis)
+    plot_h2h_summary(h2h_analysis)
