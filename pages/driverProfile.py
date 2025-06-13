@@ -113,7 +113,7 @@ if show_driver_button:
 
     plot_driver_results(driver)
     h2h_analysis = get_driver_comparisons(driver)
-
-    quali_delta = h2h_analysis[['Season', 'QualiDelta']]
-    quali_delta.set_index('Season')
-    st.line_chart(quali_delta)
+    st.dataframe(h2h_analysis)
+    # quali_delta = h2h_analysis[['Season', 'QualiDelta']]
+    # quali_delta.set_index('Season')
+    # st.line_chart(quali_delta)
