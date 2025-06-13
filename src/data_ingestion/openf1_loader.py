@@ -152,7 +152,7 @@ def get_recent_drivers(start_year:int = 2023, end_year:int = 2025):
         for each_race in year_races:
             race_drivers = get_distinct_drivers(session_key=each_race)
             print(f'Got drivers for session {each_race}')
-            time.sleep(0.5)
+            time.sleep(1)
             race_drivers['FullName'] = race_drivers['first_name'] + ' ' + race_drivers['last_name']
             race_drivers_list = race_drivers['FullName'].to_list()
             for driver in race_drivers_list: distinct_drivers.add(driver)
