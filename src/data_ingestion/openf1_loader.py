@@ -123,7 +123,6 @@ def get_driver_image(full_name: str = None) -> str:
     #        3. The headshot_url is not available on the first api response JSON
 
     name = full_name.split(' ')
-    
     if len(name) < 3:
         params = {'first_name': name[0], 'last_name': name[1]}
     else:
