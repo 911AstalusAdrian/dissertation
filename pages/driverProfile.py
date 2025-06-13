@@ -11,7 +11,7 @@ def get_drivers_data():
     drivers_list = get_distinct_drivers()
     return drivers_list
 
-@st.cache_data
+@st.cache_data(show_spinner='Fetching driver data...')
 def get_driver_stats(driver_name):
     stats = get_driver_stats_multiseason(driver_full_name=driver_name)
     return stats
