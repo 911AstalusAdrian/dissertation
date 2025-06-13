@@ -200,14 +200,14 @@ if show_driver_button:
         st.image(get_driver_photo(driver), width=150)
     with profile_col2:
         kpi_cols = st.columns(3)
-        kpi_cols[0].metric('Total Races', driver_data['Races'])
-        kpi_cols[1].metric('Finished', driver_data['Finished'])
+        kpi_cols[0].metric('Total Races', driver_data['TotalRaces'])
+        kpi_cols[1].metric('Finished', driver_data['FinshedRaces'])
         kpi_cols[2].metric('DNFs', driver_data['DNFs'])
 
         kpi_cols2 = st.columns(3)
         kpi_cols2[0].metric('Wins', driver_data['Wins'])
         kpi_cols2[1].metric('Podiums', driver_data['Podiums'])
-        kpi_cols2[2].metric('Total Points', driver_data['Points'])
+        kpi_cols2[2].metric('Total Points', driver_data['TotalPoints'])
 
         st.markdown(f'Teams raced for: {driver_data['Teams']}')
 
