@@ -304,13 +304,14 @@ def get_race_results_over_seasons(driver:str = None, starting_season:int = 2018,
                 if driver_result is None or driver_result.empty:
                     continue
 
+                dr = driver_result.iloc[0]
                 driver_results.append({
                     'Season': year,
                     'RaceName': event['EventName'],
-                    'FullName': driver_result['FullName'],
-                    'TeamName': driver_result['TeamName'],
-                    'Position': driver_result['Position'],
-                    'Points': driver_result['Points']
+                    'FullName': dr['FullName'],
+                    'TeamName': dr['TeamName'],
+                    'Position': dr['Position'],
+                    'Points': dr['Points']
                 })
             except Exception as e:
                 print(f'Error in {event['EventName']} - {year}: {e}')
