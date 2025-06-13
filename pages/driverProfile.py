@@ -111,7 +111,7 @@ if show_driver_button:
 
     #     st.markdown(f'Teams raced for: {driver_stats['Teams']}')
 
-    plot_driver_results(driver)
+    # plot_driver_results(driver)
     h2h_analysis = get_driver_comparisons(driver)
     st.dataframe(h2h_analysis)
     # quali_delta = h2h_analysis[['Season', 'QualiDelta']]
