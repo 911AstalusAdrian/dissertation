@@ -122,12 +122,16 @@ def get_driver_image(full_name: str = None) -> str:
     #        2. The headshot_url is not availavble at all
     #        3. The headshot_url is not available on the first api response JSON
 
-    first_name, last_name = full_name.split(' ')
+    name = full_name.split(' ')
     
-    params = {'first_name': first_name, 'last_name': last_name}
-    result = fetch_static_data('drivers', params)
+    if len(name) < 3:
+        params = {'first_name': name[0], 'last_name': name[1]}
+    else:
+        params = {'first_name': f'{name[1]} {name[0]}', 'last_name': name[2]}
 
-    return result.iloc[0]['headshot_url']
+    # print(params)
+    result = fetch_static_data('drivers', params)
+    return result.iloc[10]['headshot_url']
 
 
 ### Laps calls
@@ -163,4 +167,5 @@ def get_teams_for_driver(driver_name=None):
 
     return unique_teams['team_name'].to_list()
 
-# print(get_teams_for_driver('Lewis HAMILTON'))
+print(get_driver_image('Kimi Andrea Antonelli'))
+print(get_driver_image('Max Verstappen'))
