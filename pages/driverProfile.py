@@ -171,8 +171,11 @@ def plot_h2h_summary(h2h_analysis):
         legend_title='Category'
     )
 
-    st.plotly_chart(fig_quali, use_container_width=True)
-    st.plotly_chart(fig_race, use_container_width=True)
+    col1, col2 = st.columns(2)
+    with col1:
+        st.plotly_chart(fig_quali, use_container_width=True)
+    with col2:
+        st.plotly_chart(fig_race, use_container_width=True)
     
 
 drivers_list = get_drivers_data()
