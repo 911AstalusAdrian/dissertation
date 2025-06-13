@@ -308,7 +308,7 @@ def get_race_results_over_seasons(driver:str = None, starting_season:int = 2018,
                 driver_results.append({
                     'Season': year,
                     'RaceName': event['EventName'],
-                    'FullName': dr['FullName'],
+                    # 'FullName': dr['FullName'],
                     'TeamName': dr['TeamName'],
                     'Position': dr['Position'],
                     'Points': dr['Points']
