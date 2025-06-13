@@ -362,6 +362,7 @@ def get_driver_teammate_comparison_over_seasons(driver:str = None, starting_seas
     teammate_comparisons = []
 
     for year in range(starting_season, last_season + 1):
+        print(f'YEAR IS: {year}')
         quali_count = 0
         quali_delta = 0
         quali_for = 0

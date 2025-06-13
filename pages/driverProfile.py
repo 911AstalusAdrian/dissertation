@@ -29,6 +29,11 @@ def get_driver_results(driver_name):
 def get_driver_photo(driver_name):
     return get_driver_image(driver_name)
 
+@st.cache_data
+def get_driver_comparisons(driver_name):
+    comparisons = get_driver_teammate_comparison_over_seasons(driver_name)
+    return comparisons
+
 def plot_driver_results(driver_name):
     df = get_driver_results(driver_name)
 
@@ -93,7 +98,6 @@ if show_driver_button:
         st.image(get_driver_photo(driver), width=150)
 
     with profile_col2:
-        st.markdown(f'Stats for {driver}')
         kpi_cols = st.columns(3)
         kpi_cols[0].metric('Total Races', driver_stats['Races'])
         kpi_cols[1].metric('Finished', driver_stats['Finished'])
