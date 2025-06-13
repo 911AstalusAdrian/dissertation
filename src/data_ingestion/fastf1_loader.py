@@ -357,7 +357,6 @@ def calculate_quali_teammate_delta(driver_res, teammate_res):
 def calculate_race_teammate_h2h(driver_res, teammate_res):
     return driver_res['Position'] - teammate_res['Position']
 
-
 def get_driver_teammate_comparison_over_seasons(driver:str = None, starting_season:int = 2018, last_season:int = 2025):
 
     teammate_comparisons = []
@@ -413,18 +412,19 @@ def get_driver_teammate_comparison_over_seasons(driver:str = None, starting_seas
                     quali_delta += teammate_delta
 
             except Exception as e:
-                print(f'ERROR! {repr(e)}')
+                print(f'ERROR! {year} {session['EventName']} - {repr(e)}')
                 time.sleep(2)
                 continue
-
-        teammate_comparisons.append({
-            'Season': year,
-            'QualiDelta': quali_delta / quali_count,
-            'QualiFor': quali_for,
-            'QualiAgainst': quali_against,
-            'RaceFor': race_for,
-            'RaceAgainst': race_against
-        })
+        
+        if quali_count != 0:
+            teammate_comparisons.append({
+                'Season': year,
+                'QualiDelta': quali_delta / quali_count,
+                'QualiFor': quali_for,
+                'QualiAgainst': quali_against,
+                'RaceFor': race_for,    
+                'RaceAgainst': race_against
+            })
 
     teammate_comparisons_df = pd.DataFrame(teammate_comparisons)
     return teammate_comparisons_df
@@ -432,5 +432,5 @@ def get_driver_teammate_comparison_over_seasons(driver:str = None, starting_seas
 # races = get_event_names_for_season(2025)
 # print(get_average_quali_pos('Max VERSTAPPEN', 2025, races))
 # print(get_race_results_over_seasons('Oscar Piastri', 2025, 2025))
-# print(get_driver_teammate_comparison_over_seasons('Max Verstappen', 2018, 2025))
+# print(get_driver_teammate_comparison_over_seasons('Alexander Albon', 2018, 2025))
 
