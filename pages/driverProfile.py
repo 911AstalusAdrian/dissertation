@@ -6,7 +6,7 @@ from src.data_ingestion.openf1_loader import get_driver_image
 from src.data_ingestion.fastf1_loader import get_driver_full_info, get_events_for_season, get_distinct_drivers, get_driver_stats_multiseason, get_race_results_over_seasons, get_driver_teammate_comparison_over_seasons
 from src.utils.plot_utils import TEAM_COLORS
 
-@st.cache_data
+@st.cache_data(show_spinner='Getting the list of available drivers...')
 def get_drivers_data():
     drivers_list = get_distinct_drivers()
     return drivers_list

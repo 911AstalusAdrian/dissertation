@@ -467,7 +467,6 @@ def get_driver_full_info(driver:str = None, starting_season:int = 2018, last_sea
         except Exception as e:
             print(f'Failed to get schedule for year {year}')
         for _, event in schedule.iterrows():
-            print(f'{year} - {event['EventName']}')
             # Skip over testing sessions
             if event['EventFormat'] == 'testing':
                 continue
@@ -587,7 +586,7 @@ def get_driver_full_info(driver:str = None, starting_season:int = 2018, last_sea
 
     comparisons_df = pd.DataFrame(teammate_comparisons)
     driver_info['Comparisons'] = comparisons_df
-    print(driver_info)
+    return driver_info
 
 
 
