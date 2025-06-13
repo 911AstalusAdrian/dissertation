@@ -44,7 +44,7 @@ def plot_driver_results(driver_name):
     segment_x, segment_y = [], []
     prev_team = df.loc[0, 'TeamName']
 
-    for i, row in df.iterrows:
+    for i, row in df.iterrows():
         current_team = row['TeamName']
         color = TEAM_COLORS.get(current_team, '#888888')
 
