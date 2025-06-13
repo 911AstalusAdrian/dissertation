@@ -83,8 +83,8 @@ def plot_h2h(driver_name):
 
     # Main QualiDelta line
     fig.add_trace(go.Scatter(
-        x=df['Season'],
-        y=df['QualiDelta'],
+        x=quali_delta['Season'],
+        y=quali_delta['QualiDelta'],
         mode='lines+markers',
         name='Quali Delta',
         line=dict(color='blue', width=2),
@@ -93,8 +93,8 @@ def plot_h2h(driver_name):
 
     # Horizontal zero baseline
     fig.add_trace(go.Scatter(
-        x=df['Season'],
-        y=[0] * len(df),
+        x=quali_delta['Season'],
+        y=[0] * len(quali_delta),
         mode='lines',
         name='Baseline (0s)',
         line=dict(color='red', dash='dash'),
