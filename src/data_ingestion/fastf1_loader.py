@@ -425,10 +425,12 @@ def get_driver_teammate_comparison_over_seasons(driver:str = None, starting_seas
             'RaceFor': race_for,
             'RaceAgainst': race_against
         })
-    return teammate_comparisons
+
+    teammate_comparisons_df = pd.DataFrame(teammate_comparisons)
+    return teammate_comparisons_df
 
 # races = get_event_names_for_season(2025)
 # print(get_average_quali_pos('Max VERSTAPPEN', 2025, races))
 # print(get_race_results_over_seasons('Oscar Piastri', 2025, 2025))
-print(get_driver_teammate_comparison_over_seasons('Max Verstappen', 2018, 2025))
+# print(get_driver_teammate_comparison_over_seasons('Max Verstappen', 2018, 2025))
 
