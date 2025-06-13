@@ -54,7 +54,7 @@ if analyse_synergy:
 
     df = pd.DataFrame(data)
     df.index.name = 'Round'
-    st.line_chart(df)
+    st.line_chart(df, color=["#FF0000", "#0000FF"])
 
     # # Trend Charts (placeholders)
     # st.subheader("Qualifying vs Race Position")
