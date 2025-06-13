@@ -190,12 +190,9 @@ show_driver_button = st.sidebar.button('Show Driver Details')
 if show_driver_button:
     st.header(f"Stats for {driver}")
     driver_stats = get_driver_stats(driver)
-
     profile_col1, profile_col2 = st.columns([1,3])
-
     with profile_col1:
         st.image(get_driver_photo(driver), width=150)
-
     with profile_col2:
         kpi_cols = st.columns(3)
         kpi_cols[0].metric('Total Races', driver_stats['Races'])
@@ -209,7 +206,9 @@ if show_driver_button:
 
         st.markdown(f'Teams raced for: {driver_stats['Teams']}')
 
-    plot_driver_results(driver)
-    h2h_analysis = get_driver_comparisons(driver)
-    plot_h2h(h2h_analysis)
-    plot_h2h_summary(h2h_analysis)
+    plots = st.button('Show driver H2H analysis')
+    if plots:
+        plot_driver_results(driver)
+        h2h_analysis = get_driver_comparisons(driver)
+        plot_h2h(h2h_analysis)
+        plot_h2h_summary(h2h_analysis)
