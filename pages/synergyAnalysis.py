@@ -1,26 +1,25 @@
 import streamlit as st
 import pandas as pd
 
-from src.data_ingestion.openf1_loader import get_fulltime_drivers, get_teams_for_driver
-from src.data_ingestion.fastf1_loader import get_event_names_for_season, get_average_quali_pos
+# from src.data_ingestion.openf1_loader import get_fulltime_drivers, get_teams_for_driver
+# from src.data_ingestion.fastf1_loader import get_event_names_for_season, get_average_quali_pos
 
-def get_list_of_drivers():
-    distinct_drivers_df = get_fulltime_drivers()
+from src.data_ingestion.openf1_loader import get_recent_drivers
 
-    return distinct_drivers_df['full_name'].to_list()
+def get_latest_drivers():
+    recent_drivers_list = get_recent_drivers()
 
-def get_driver_teams(driver_name):
-    return get_teams_for_driver(driver_name)
+# def get_driver_teams(driver_name):
+#     return get_teams_for_driver(driver_name)
 
-st.sidebar.header("Select Inputs")
-driver = st.sidebar.selectbox("Driver", get_list_of_drivers())
-season = st.sidebar.selectbox("Season", [2023, 2024, 2025])
-races = st.sidebar.selectbox('Race', get_event_names_for_season(season))
+driver = st.selectbox("Driver", get_latest_drivers())
+season = st.selectbox("Season", [2023, 2024, 2025])
+# races = st.selectbox('Race', get_event_names_for_season(season))
 
-if st.sidebar.button("Analyze Synergy"):
+if st.button("Analyze Synergy"):
 
-    season_races = get_event_names_for_season(season)
-    average_quali_pos = get_average_quali_pos(driver, season, season_races)
+    # season_races = get_event_names_for_season(season)
+    # average_quali_pos = get_average_quali_pos(driver, season, season_races)
 
 
 

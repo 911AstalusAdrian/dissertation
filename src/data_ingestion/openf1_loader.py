@@ -2,6 +2,7 @@
 
 import requests
 import pandas as pd
+import time
 
 BASE_URL = 'https://api.openf1.org/v1/'
 
@@ -83,6 +84,15 @@ def get_distinct_drivers(country_code=None, driver_number=None, meeting_key=None
     unique_drivers = all_drivers.drop_duplicates(subset='full_name')
     return unique_drivers # returns the entire dataframe
 
+def get_distinct_drivers_list(country_code=None, driver_number=None, meeting_key=None, session_key=None, team_name=None):
+    params = {'country_code': country_code,
+            'driver_number': driver_number,
+            'meeting_key': meeting_key,
+            'session_key': session_key,
+            'team_name': team_name}
+    all_drivers =  fetch_static_data('drivers', params)
+    unique_drivers = all_drivers.drop_duplicates(subset='full_name')
+
 def get_fulltime_drivers():
     unique_drivers = get_distinct_drivers()
 
@@ -132,6 +142,22 @@ def get_driver_image(full_name: str = None) -> str:
     result = fetch_static_data('drivers', params)
     return result.iloc[10]['headshot_url']
 
+def get_recent_drivers(start_year:int = 2023, end_year:int = 2025):
+
+    distinct_drivers = set()
+
+    for each_year in range(start_year, end_year+1):
+        year_races = get_sessions_list(session_name='Race', year=each_year)
+        print(f'Got sessions for {each_year}')
+        for each_race in year_races:
+            race_drivers = get_distinct_drivers(session_key=each_race)
+            print(f'Got drivers for session {each_race}')
+            time.sleep(0.5)
+            race_drivers['FullName'] = race_drivers['first_name'] + ' ' + race_drivers['last_name']
+            race_drivers_list = race_drivers['FullName'].to_list()
+            for driver in race_drivers_list: distinct_drivers.add(driver)
+    return distinct_drivers
+
 
 ### Laps calls
 
@@ -166,5 +192,12 @@ def get_teams_for_driver(driver_name=None):
 
     return unique_teams['team_name'].to_list()
 
-print(get_driver_image('Kimi Andrea Antonelli'))
-print(get_driver_image('Max Verstappen'))
+# print(get_sessions_list(session_name='Race', year=2023))
+
+
+
+
+# get_active_drivers()
+# drivers = get_distinct_drivers(session_key=9971)
+# drivers['FullName'] = drivers['first_name'] + ' ' + drivers['last_name']
+# print(drivers['FullName'].to_list())

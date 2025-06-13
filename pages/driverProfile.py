@@ -11,25 +11,25 @@ def get_drivers_data():
     drivers_list = get_distinct_drivers()
     return drivers_list
 
-@st.cache_data(show_spinner='Fetching driver data...')
-def get_driver_stats(driver_name):
-    stats = get_driver_stats_multiseason(driver_full_name=driver_name)
-    return stats
+# @st.cache_data(show_spinner='Fetching driver data...')
+# def get_driver_stats(driver_name):
+#     stats = get_driver_stats_multiseason(driver_full_name=driver_name)
+#     return stats
 
-@st.cache_data
-def get_driver_results(driver_name):
-    results = get_race_results_over_seasons(driver_name)
-    return results
+# @st.cache_data
+# def get_driver_results(driver_name):
+#     results = get_race_results_over_seasons(driver_name)
+#     return results
 
 
 @st.cache_data
 def get_driver_photo(driver_name):
     return get_driver_image(driver_name)
 
-@st.cache_data
-def get_driver_comparisons(driver_name):
-    comparisons = get_driver_teammate_comparison_over_seasons(driver_name)
-    return comparisons
+# @st.cache_data
+# def get_driver_comparisons(driver_name):
+#     comparisons = get_driver_teammate_comparison_over_seasons(driver_name)
+#     return comparisons
 
 def plot_driver_results(df):
 
