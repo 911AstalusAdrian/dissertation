@@ -324,4 +324,4 @@ def get_race_results_over_seasons(driver:str = None, starting_season:int = 2018,
 # races = get_event_names_for_season(2025)
 # print(get_average_quali_pos('Max VERSTAPPEN', 2025, races))
 
-print(get_race_results_over_seasons('Oscar Piastri', 2025, 2025))
+# print(get_race_results_over_seasons('Oscar Piastri', 2025, 2025))
