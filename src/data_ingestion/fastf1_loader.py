@@ -434,3 +434,6 @@ def get_driver_teammate_comparison_over_seasons(driver:str = None, starting_seas
 # print(get_average_quali_pos('Max VERSTAPPEN', 2025, races))
 # print(get_race_results_over_seasons('Oscar Piastri', 2025, 2025))
 # print(get_driver_teammate_comparison_over_seasons('Alexander Albon', 2018, 2025))
+
+
+# for i in range(2018, 2025):

@@ -5,7 +5,7 @@ import matplotlib.pyplot as plt
 
 from datetime import timedelta
 from src.data_ingestion.openf1_loader import get_driver_image
-from src.data_ingestion.fastf1_loader import get_distinct_drivers, get_driver_stats_multiseason, get_race_results_over_seasons, get_driver_teammate_comparison_over_seasons
+from src.data_ingestion.fastf1_loader import get_events_for_season, get_distinct_drivers, get_driver_stats_multiseason, get_race_results_over_seasons, get_driver_teammate_comparison_over_seasons
 from src.utils.df_utils import format_laptime
 from src.utils.plot_utils import TEAM_COLORS
 
@@ -29,8 +29,9 @@ def get_driver_results(driver_name):
 def get_driver_photo(driver_name):
     return get_driver_image(driver_name)
 
-@st.cache_data
+# @st.cache_data
 def get_driver_comparisons(driver_name):
+    return get_events_for_season(2025)
     comparisons = get_driver_teammate_comparison_over_seasons(driver_name)
     return comparisons
 
