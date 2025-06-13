@@ -587,3 +587,61 @@ def get_driver_full_info(driver:str = None, starting_season:int = 2018, last_sea
     comparisons_df = pd.DataFrame(teammate_comparisons)
     driver_info['Comparisons'] = comparisons_df
     return driver_info
+
+
+def get_synergy_metrics(driver:str = None, season:int = 2025):
+
+    synergy_results = {}
+    qualifying_positions = {}
+    race_positions = {}
+    quali_pos = 0
+    quali_count = 0
+    race_count = 0
+    race_sum = 0
+    dnf_count = 0
+
+    for round in range (1, 25):
+        try:
+
+            # Load Round's Qualifying
+            quali = fastf1.get_session(season, round, 'Q')
+            quali.load(laps=False, telemetry=False, weather=False, messages=False, livedata=False)
+            quali_results = quali.results # Get Quali results
+            driver_quali = quali_results.loc[quali_results['FullName'] == driver] # Get Driver Quali data
+            driver_quali = driver_quali.iloc[0]
+            # Qualifying-related stats
+            quali_pos += driver_quali['Position']   # add quali positions
+            quali_count += 1                        # count qualifiers
+            qualifying_positions[round] = int(driver_quali['Position']) # add quali pos to dict (for visualisations)
+        except Exception as e:
+            print(f'Error for quali round {round}: {str(e)}')
+
+        try:
+            # Load Round's Race
+            race = fastf1.get_session(season, round, 'R')
+            race.load(laps=False, telemetry=False, weather=False, messages=False, livedata=False)
+            race_results = race.results # Get Race results
+            driver_race = race_results.loc[race_results['FullName'] == driver] # Get Driver Race data
+            driver_race = driver_race.iloc[0]
+            # Race related stats
+            race_pos = driver_race['Position']
+            race_sum += race_pos
+            # race_start = driver_race['GridPosition']
+            race_status = driver_race['Status']
+            race_positions[round] = int(race_pos)
+            if race_status in DNF_STATUSES:
+                dnf_count += 1
+            race_count += 1
+        except Exception as e:
+            print(f'Error for race round {round}: {str(e)}')
+
+    synergy_results['Avg_Q'] = quali_pos/quali_count
+    synergy_results['Avg_R'] = race_sum/race_count
+    synergy_results['DNFRate'] = (dnf_count * 100) / race_count
+    synergy_results['Q_positions'] = qualifying_positions
+    synergy_results['R_positions'] = race_positions
+
+    return synergy_results
+
+metrics = get_synergy_metrics('Alexander Albon', 2023)
+print(metrics.get('R_positions'))

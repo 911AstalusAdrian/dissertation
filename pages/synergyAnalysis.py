@@ -1,12 +1,16 @@
 import streamlit as st
 import pandas as pd
 
-from src.data_ingestion.openf1_loader import get_recent_drivers
+from src.data_ingestion.openf1_loader import get_synergy_metrics, get_recent_drivers
 
 @st.cache_data(show_spinner='Loading list of recent drivers...')
 def get_latest_drivers():
     recent_drivers_list = get_recent_drivers()
     return list(recent_drivers_list)
+
+def get_synergy_stats(driver, season):
+    synergy_results = get_synergy_metrics(driver, season)
+    return synergy_results
 
 cols = st.columns(3)
 with cols[0]:
@@ -19,6 +23,7 @@ with cols[2]:
 
 if analyse_synergy:
 
+    synergy_stats = get_synergy_stats(driver, season)
     st.markdown(f'Analysing {driver} fror the {season} season')
 
     # average quali position
@@ -26,46 +31,45 @@ if analyse_synergy:
     # dnf rate
     # lap standard deviation
     # delta to teammate
-    
-
-    # Placeholder: compute synergy_stats, lap_time_df, position_deltas
-    synergy_stats = {
-        "avg_quali_pos": 3.2,
-        "avg_finish_pos": 2.8,
-        "dnf_rate": 0.1,
-        "lap_std": 0.45,
-        "delta_to_teammate": -1.2
-    }
-
-    # st.subheader(f"Synergy Report for {driver} ({season})")
 
     # KPI cards
     col1, col2, col3 = st.columns(3)
-    col1.metric("Avg Qualifying Pos", f"{synergy_stats['avg_quali_pos']:.2f}")
-    col2.metric("Avg Finish Pos", f"{synergy_stats['avg_finish_pos']:.2f}")
-    col3.metric("DNF Rate", f"{synergy_stats['dnf_rate']*100:.1f}%")
+    col1.metric("Avg Qualifying Pos", f"{synergy_stats['Avg_Q']:.2f}")
+    col2.metric("Avg Finish Pos", f"{synergy_stats['Avg_R']:.2f}")
+    col3.metric("DNF Rate", f"{synergy_stats['DNFRate']:.1f}%")
 
-    col4, col5 = st.columns(2)
-    col4.metric("Lap Consistency (Std Dev)", f"{synergy_stats['lap_std']:.2f}s")
-    col5.metric("Avg Delta to Teammate", f"{synergy_stats['delta_to_teammate']:+.2f} pos")
+    # col4, col5 = st.columns(2)
+    # col4.metric("Lap Consistency (Std Dev)", f"{synergy_stats['lap_std']:.2f}s")
+    # col5.metric("Avg Delta to Teammate", f"{synergy_stats['delta_to_teammate']:+.2f} pos")
 
     st.divider()
 
-    # Trend Charts (placeholders)
-    st.subheader("Qualifying vs Race Position")
-    st.line_chart(pd.DataFrame({
-        "Qualifying": [4, 3, 2, 5],
-        "Race": [2, 1, 2, 3]
-    }, index=["Bahrain", "Saudi Arabia", "Australia", "Azerbaijan"]))
+    qualis = synergy_stats.get('Q_positions')
+    races = synergy_stats.get('R_positions')
+    data = {
+        'Qualis': qualis,
+        'Races': races
+    }
 
-    st.subheader("Lap Time Consistency")
+    df = pd.DataFrame(data)
+    df.index.name = 'Round'
+    st.line_chart(df)
+
+    # # Trend Charts (placeholders)
+    # st.subheader("Qualifying vs Race Position")
+    # st.line_chart(pd.DataFrame({
+    #     "Qualifying": [4, 3, 2, 5],
+    #     "Race": [2, 1, 2, 3]
+    # }, index=["Bahrain", "Saudi Arabia", "Australia", "Azerbaijan"]))
+
+    # st.subheader("Lap Time Consistency")
     # st.box_chart(pd.DataFrame({
     #     "GP": ["Bahrain", "Saudi", "Australia", "Azerbaijan"],
     #     "LapTime": [0.3, 0.25, 0.45, 0.4]
     # }))
 
-    st.subheader("Delta to Teammate per Race")
-    st.bar_chart(pd.Series([-0.5, -1.0, -1.2, 0.0], index=["Bahrain", "Saudi", "Australia", "Azerbaijan"]))
+    # st.subheader("Delta to Teammate per Race")
+    # st.bar_chart(pd.Series([-0.5, -1.0, -1.2, 0.0], index=["Bahrain", "Saudi", "Australia", "Azerbaijan"]))
 
 # picker_col1, picker_col2 = st.columns(2)
 # with picker_col1:
