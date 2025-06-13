@@ -1,26 +1,13 @@
 # Responsible for loading the data from the FastF1 Python package
-from src.utils.cache import *
-
 import fastf1
 import pandas as pd
 import numpy as np
 import time
 
-from datetime import timedelta
-from datetime import datetime
+from datetime import timedelta, datetime
 
-
-SCHEDULE_CACHE = {
-    '2018': None,
-    '2019': None,
-    '2020': None,
-    '2021': None,
-    '2022': None,
-    '2023': None,
-    '2024': None,
-    '2025': None
-}
-
+DNF_STATUSES = ['Collision damage', 'Hydraulics', 'Radiator', 'Collision', 'Retired', 'Did not start', 'Mechanical', 'Electronics']
+FINISHED_STATUSES = ['+2 Laps', 'Lapped', 'Finished', '+1 Lap']
 
 def format_laptime(td:timedelta) -> str:
 
@@ -454,4 +441,171 @@ def get_driver_teammate_comparison_over_seasons(driver:str = None, starting_seas
 # print(get_driver_teammate_comparison_over_seasons('Alexander Albon', 2018, 2025))
 
 
-# for i in range(2018, 2025):
+def get_driver_full_info(driver:str = None, starting_season:int = 2018, last_season:int = 2025):
+    driver_info = {
+        'TotalRaces' : 0,
+        'Finished': 0,
+        'DNFs': 0,
+        'Wins': 0,
+        'Podiums': 0,
+        'Points': 0,
+        'Teams': set()
+    }
+
+    results = []
+    teammate_comparisons = []
+
+    for year in range(starting_season, last_season+1):
+        quali_count = 0
+        quali_delta = 0
+        quali_for = 0
+        quali_against = 0
+        race_for = 0
+        race_against = 0
+        try:
+            schedule = fastf1.get_event_schedule(year)
+        except Exception as e:
+            print(f'Failed to get schedule for year {year}')
+        for _, event in schedule.iterrows():
+            # Skip over testing sessions
+            if event['EventFormat'] == 'testing':
+                continue
+
+            # Skip over events in the future
+            if event['EventDate'] > datetime.today():
+                continue
+
+            # Get the race event and load the results
+            event_race = event.get_race()
+            event_race.load(laps=False, telemetry=False, weather=False, messages=False, livedata=False)
+            race_results = event_race.results
+            driver_result = race_results.loc[race_results['FullName'] == driver]
+
+            # Skip events in which the driver was not part of the race
+            if driver_result.empty:
+                print('Driver did not participate in this event!')
+                continue
+
+            # Process general race stats
+            driver_result = driver_result.iloc[0]
+
+            driver_info['TotalRaces'] += 1 # Total Races
+
+            # race status
+            status = driver_result['Status']
+            if status in DNF_STATUSES:
+                driver_info['DNFs'] += 1 # DNF Races
+            if status in FINISHED_STATUSES:
+                driver_info['Finished'] += 1 # Finished Races
+
+            # race position
+            position = driver_result['Position']
+            if position == 1:
+                driver_info['Wins'] += 1 # Race Wins
+            if position >= 1 and position <= 3:
+                driver_info['Podiums'] += 1  # Race Podiums
+
+            # total points
+            points = driver_result['Points']
+            driver_info['Points'] += points
+
+            # team
+            team = driver_result['TeamName']
+            driver_info['Teams'].add(team)
+
+
+            # driver results list
+            team_name = driver_result['TeamName']
+            results.append({
+                'Season': year,
+                'RaceName': event['EventName'],
+                'TeamName': driver_result['TeamName'],
+                'Position': position,
+                'Points': points
+            })
+
+            # Calculate race H2H with teammate
+            team_id = driver_result['TeamId'] # Team ID for better data gathering
+
+            # Get the result of the teammate
+            teammate_race_result = race_results.loc[(race_results['TeamId'] == team_id) & (race_results['FullName'] != driver)]
+            teammate_race_result = teammate_race_result.iloc[0]
+
+            # Compute race position delta
+            race_diff = driver_result['Position'] - teammate_race_result['Position']
+            if race_diff < 0 : race_for += 1
+            else : race_against += 1
+
+            time.sleep(0.5) # sleep to avoid overloading the API call
+
+            # Load qualifying session
+            event_quali = event.get_qualifying()
+            event_quali.load(laps=False, telemetry=False, weather=False, messages=False, livedata=False)
+            quali_results = event_quali.results
+
+            # Get driver quali result
+            driver_quali_result = quali_results.loc[quali_results['FullName'] == driver]
+            driver_quali_result = driver_quali_result.iloc[0]
+
+            # Get teammate quali result
+            teammate_quali_result = quali_results.loc[(quali_results['TeamId'] == team_id) & (quali_results['FullName'] != driver)]
+            teammate_quali_result = teammate_quali_result.iloc[0]
+
+            # Calculate quali delta
+            teammate_delta = calculate_quali_teammate_delta(driver_quali_result, teammate_quali_result)
+            # Invalid quali deltas are marked with 0 (teammate or driver did not take part in Q, or delta > 5s)
+            # does not take into consideration weather changes (ex: Canada 2023)
+            if teammate_delta != timedelta(seconds=0).total_seconds():
+                if teammate_delta > pd.Timedelta(0).total_seconds() : quali_against += 1
+                else: quali_for += 1
+                quali_count += 1
+                quali_delta += teammate_delta
+
+        if quali_count != 0:
+            teammate_comparisons.append({
+                'Season': year,
+                'QualiDelta': quali_delta / quali_count,
+                'QualiFor': quali_for,
+                'QualiAgainst': quali_against,
+                'RaceFor': race_for,
+                'RaceAgainst': race_against
+            })    
+
+
+    results_df = pd.DataFrame(results)
+    driver_info['Results'] = results_df
+
+    comparisons_df = pd.DataFrame(teammate_comparisons)
+    driver_info['Comparisons'] = comparisons_df
+    print(driver_info)
+
+
+
+print(get_driver_full_info('Alexander Albon', 2025, 2025))
+# print(get_race_results_over_seasons('Alexander Albon', 2025, 2025))
+
+# {
+#     'TotalRaces': int, #add over the seasons
+#     'FinshedRaces': int, #add over the seasons
+#     'DNFs': int, #add over the seasons
+#     'Wins': int, #add over the seasons
+#     'Podiums': int, #add over the seasons
+#     'TotalPoints': int, #add over the seasons
+#     'Teams': set(), #add over the seasons   
+#     'Results': {
+#         'Season': year,
+#         'RaceName': event['EventName'],
+#         # 'FullName': dr['FullName'],
+#         'TeamName': dr['TeamName'],
+#         'Position': dr['Position'],
+#         'Points': dr['Points']
+#     },
+#     'Comparisons': {
+#         'Season': year,
+#         'QualiDelta': quali_delta / quali_count,
+#         'QualiFor': quali_for,
+#         'QualiAgainst': quali_against,
+#         'RaceFor': race_for,    
+#         'RaceAgainst': race_against
+#     }
+# }
