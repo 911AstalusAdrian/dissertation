@@ -31,8 +31,7 @@ def get_driver_comparisons(driver_name):
     comparisons = get_driver_teammate_comparison_over_seasons(driver_name)
     return comparisons
 
-def plot_driver_results(driver_name):
-    df = get_driver_results(driver_name)
+def plot_driver_results(df):
 
     df['RaceIndex'] = range(len(df)) # add a race index
 
