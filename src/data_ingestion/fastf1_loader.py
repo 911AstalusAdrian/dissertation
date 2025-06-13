@@ -303,6 +303,8 @@ def get_race_results_over_seasons(driver:str = None, starting_season:int = 2018,
     for year in range(starting_season, last_season + 1):
         # schedule = fastf1.get_event_schedule(year)
         schedule = SCHEDULE_CACHE.get(year)
+        if schedule is None:
+            schedule = fastf1.get_event_schedule(year)
     # cleaning the schedule (remove testing 
         for _, event in schedule.iterrows():
             try:
