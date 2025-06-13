@@ -1,5 +1,6 @@
 import streamlit as st
 import matplotlib.pyplot as plt
+import plotly.graph_objects as go
 
 from src.data_ingestion.openf1_loader import get_driver_image
 from src.data_ingestion.fastf1_loader import get_events_for_season, get_distinct_drivers, get_driver_stats_multiseason, get_race_results_over_seasons, get_driver_teammate_comparison_over_seasons
@@ -74,6 +75,41 @@ def plot_driver_results(driver_name):
 
     st.pyplot(fig)
 
+def plot_h2h(driver_name):
+    h2h_analysis = get_driver_comparisons(driver_name)
+    quali_delta = h2h_analysis[['Season', 'QualiDelta']]
+    quali_delta['Season'] = quali_delta['Season'].astype(str)
+    fig = go.Figure()
+
+    # Main QualiDelta line
+    fig.add_trace(go.Scatter(
+        x=df['Season'],
+        y=df['QualiDelta'],
+        mode='lines+markers',
+        name='Quali Delta',
+        line=dict(color='blue', width=2),
+        marker=dict(size=6)
+    ))
+
+    # Horizontal zero baseline
+    fig.add_trace(go.Scatter(
+        x=df['Season'],
+        y=[0] * len(df),
+        mode='lines',
+        name='Baseline (0s)',
+        line=dict(color='red', dash='dash'),
+        showlegend=True
+    ))
+
+    fig.update_layout(
+        title='Avg Qualifying Delta vs Teammate (per Season)',
+        xaxis_title='Season',
+        yaxis_title='Delta (s)',
+        yaxis=dict(zeroline=False),
+        legend=dict(yanchor="top", y=0.99, xanchor="left", x=0.01)
+    )
+
+    st.plotly_chart(fig, use_container_width=True)
 
 drivers_list = get_drivers_data()
 seasons = list(range(2018, 2026))
@@ -107,9 +143,4 @@ if show_driver_button:
     #     st.markdown(f'Teams raced for: {driver_stats['Teams']}')
 
     # plot_driver_results(driver)
-
-
-    h2h_analysis = get_driver_comparisons(driver)
-    quali_delta = h2h_analysis[['Season', 'QualiDelta']]
-    quali_delta['Season'] = quali_delta['Season'].astype(str)
-    st.line_chart(quali_delta, x='Season', y='QualiDelta')
+    plot_h2h(driver)
