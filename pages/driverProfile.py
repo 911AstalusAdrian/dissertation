@@ -64,9 +64,8 @@ def plot_driver_results(driver_name):
     ax.set_xlabel('Race Index')
     ax.set_ylabel('Finishing Position')
     ax.set_title('Driver Race Results')
-    ax.set_xticks(range(1, len(df)))
-    ax.set_yticks(range(max_pos, 1, -1))
-    ax.set_yticklabels(list(range(max_pos, 1, -1)))
+    ax.set_yticks(range(max_pos, 0, -1))
+    ax.set_yticklabels(list(range(max_pos, 0, -1)))
     ax.invert_yaxis()  # P1 on top
     ax.legend(title="Teams", loc='upper right')
     ax.grid(True, linestyle='--', alpha=0.5)
