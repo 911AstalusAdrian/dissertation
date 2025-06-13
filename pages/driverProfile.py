@@ -25,9 +25,8 @@ def get_driver_results(driver_name):
 def get_driver_photo(driver_name):
     return get_driver_image(driver_name)
 
-# @st.cache_data
+@st.cache_data
 def get_driver_comparisons(driver_name):
-    return get_events_for_season(2025)
     comparisons = get_driver_teammate_comparison_over_seasons(driver_name)
     return comparisons
 
@@ -111,7 +110,6 @@ if show_driver_button:
 
 
     h2h_analysis = get_driver_comparisons(driver)
-    st.dataframe(h2h_analysis)
-    # quali_delta = h2h_analysis[['Season', 'QualiDelta']]
-    # quali_delta.set_index('Season')
-    # st.line_chart(quali_delta)
+    quali_delta = h2h_analysis[['Season', 'QualiDelta']]
+    quali_delta.set_index('Season')
+    st.line_chart(quali_delta)
