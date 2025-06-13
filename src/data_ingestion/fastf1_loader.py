@@ -211,6 +211,7 @@ def get_driver_stats_multiseason(driver_full_name: str, start_year: int = 2018, 
     for year in range(start_year, end_year + 1):
         try:
             schedule = fastf1.get_event_schedule(year)
+            SCHEDULE_CACHE[year] = schedule
         except Exception as e:
             print(f"Skipping year {year}: {e}")
             continue
@@ -262,6 +263,7 @@ def get_driver_stats_multiseason(driver_full_name: str, start_year: int = 2018, 
 
 def get_events_for_season(season:int = 2025):
     schedule = fastf1.get_event_schedule(season)
+    # schedule = SCHEDULE_CACHE.get(season)
     # cleaning the schedule (remove testing and keep only completed events for current year)
     for index, event in schedule.iterrows():
         if event['EventFormat'] == 'testing':
@@ -299,7 +301,8 @@ def get_race_results_over_seasons(driver:str = None, starting_season:int = 2018,
     driver_results = []
 
     for year in range(starting_season, last_season + 1):
-        schedule = fastf1.get_event_schedule(year)
+        # schedule = fastf1.get_event_schedule(year)
+        schedule = SCHEDULE_CACHE.get(year)
     # cleaning the schedule (remove testing 
         for _, event in schedule.iterrows():
             try:
