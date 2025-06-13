@@ -1,7 +1,8 @@
 import streamlit as st
 import pandas as pd
 
-from src.data_ingestion.openf1_loader import get_synergy_metrics, get_recent_drivers
+from src.data_ingestion.openf1_loader import get_recent_drivers
+from src.data_ingestion.fastf1_loader import get_synergy_metrics
 
 @st.cache_data(show_spinner='Loading list of recent drivers...')
 def get_latest_drivers():
