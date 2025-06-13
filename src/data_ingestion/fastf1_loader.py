@@ -10,6 +10,16 @@ from datetime import timedelta
 from datetime import datetime
 
 
+SCHEDULE_CACHE = {
+    '2018': None,
+    '2019': None,
+    '2020': None,
+    '2021': None,
+    '2022': None,
+    '2023': None,
+    '2024': None,
+    '2025': None
+}
 
 
 def format_laptime(td:timedelta) -> str:
@@ -183,7 +193,7 @@ def get_distinct_drivers(first_season = 2018, last_season = 2025):
 
     return sorted(all_drivers)
 
-def get_driver_stats_multiseason(driver_full_name: str, start_year: int = 2018, end_year: int = None) -> dict:
+def get_driver_stats_multiseason(driver_full_name: str, start_year: int = 2018, end_year: int = None) -> dict:  
     if end_year is None:
         end_year = datetime.now().year
 
@@ -200,7 +210,7 @@ def get_driver_stats_multiseason(driver_full_name: str, start_year: int = 2018, 
 
     for year in range(start_year, end_year + 1):
         try:
-            schedule = get_schedule_for_year(year)
+            schedule = fastf1.get_event_schedule(year)
         except Exception as e:
             print(f"Skipping year {year}: {e}")
             continue
@@ -251,7 +261,11 @@ def get_driver_stats_multiseason(driver_full_name: str, start_year: int = 2018, 
     return stats
 
 def get_events_for_season(season:int = 2025):
-    schedule = get_schedule_for_year(season)
+
+    schedule = SCHEDULE_CACHE.get(season, None)
+    if schedule is None:
+        schedule = fastf1.get_event_schedule(season)
+        SCHEDULE_CACHE[season] = schedule
     # cleaning the schedule (remove testing and keep only completed events for current year)
     for index, event in schedule.iterrows():
         if event['EventFormat'] == 'testing':
@@ -289,7 +303,11 @@ def get_race_results_over_seasons(driver:str = None, starting_season:int = 2018,
     driver_results = []
 
     for year in range(starting_season, last_season + 1):
-        schedule = get_events_for_season(year)
+        schedule = SCHEDULE_CACHE.get(year, None)
+        if schedule is None:
+            schedule = fastf1.get_event_schedule(year)
+            SCHEDULE_CACHE[year] = schedule
+    # cleaning the schedule (remove testing 
         for _, event in schedule.iterrows():
             try:
                 # Get and Load race results
@@ -434,7 +452,7 @@ def get_driver_teammate_comparison_over_seasons(driver:str = None, starting_seas
 # races = get_event_names_for_season(2025)
 # print(get_average_quali_pos('Max VERSTAPPEN', 2025, races))
 # print(get_race_results_over_seasons('Oscar Piastri', 2025, 2025))
-print(get_driver_teammate_comparison_over_seasons('Alexander Albon', 2018, 2025))
+# print(get_driver_teammate_comparison_over_seasons('Alexander Albon', 2018, 2025))
 
 
 # for i in range(2018, 2025):
