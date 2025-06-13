@@ -90,26 +90,26 @@ driver = st.sidebar.selectbox("Choose Driver", options=drivers_list)  # Example 
 show_driver_button = st.sidebar.button('Show Driver Details')
 
 if show_driver_button:
-    st.header(f"Stats for {driver}")
-    driver_stats = get_driver_stats(driver)
+    # st.header(f"Stats for {driver}")
+    # driver_stats = get_driver_stats(driver)
 
-    profile_col1, profile_col2 = st.columns([1,3])
+    # profile_col1, profile_col2 = st.columns([1,3])
 
-    with profile_col1:
-        st.image(get_driver_photo(driver), width=150)
+    # with profile_col1:
+    #     st.image(get_driver_photo(driver), width=150)
 
-    with profile_col2:
-        kpi_cols = st.columns(3)
-        kpi_cols[0].metric('Total Races', driver_stats['Races'])
-        kpi_cols[1].metric('Finished', driver_stats['Finished'])
-        kpi_cols[2].metric('DNFs', driver_stats['DNFs'])
+    # with profile_col2:
+    #     kpi_cols = st.columns(3)
+    #     kpi_cols[0].metric('Total Races', driver_stats['Races'])
+    #     kpi_cols[1].metric('Finished', driver_stats['Finished'])
+    #     kpi_cols[2].metric('DNFs', driver_stats['DNFs'])
 
-        kpi_cols2 = st.columns(3)
-        kpi_cols2[0].metric('Wins', driver_stats['Wins'])
-        kpi_cols2[1].metric('Podiums', driver_stats['Podiums'])
-        kpi_cols2[2].metric('Total Points', driver_stats['Points'])
+    #     kpi_cols2 = st.columns(3)
+    #     kpi_cols2[0].metric('Wins', driver_stats['Wins'])
+    #     kpi_cols2[1].metric('Podiums', driver_stats['Podiums'])
+    #     kpi_cols2[2].metric('Total Points', driver_stats['Points'])
 
-        st.markdown(f'Teams raced for: {driver_stats['Teams']}')
+    #     st.markdown(f'Teams raced for: {driver_stats['Teams']}')
 
     plot_driver_results(driver)
     h2h_analysis = get_driver_comparisons(driver)
