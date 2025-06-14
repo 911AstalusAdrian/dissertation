@@ -34,7 +34,7 @@ if analyse_synergy:
     col2.metric("Avg Finish Pos", f"{synergy_stats['Avg_R']:.2f}")
     col3.metric("DNF Rate", f"{synergy_stats['DNFRate']:.1f}%")
     col4.metric("Lap Consistency (Std Dev)", f"{synergy_stats['Lap_stdev']:.2f}s")
-    col5.metric("Avg Delta to Teammate", f"{synergy_stats['Teammate_delta']:+.2f} pos")
+    col5.metric("Avg Delta to Teammate", f"{synergy_stats['Teammate_delta']:+.2f}s")
 
     st.divider()
 
@@ -57,4 +57,4 @@ if analyse_synergy:
             'LapDelta': lap_deltas
         }
         df = pd.DataFrame(plot2_data)
-        st.line_chart(df, color=synergy_stats.get('Color'))
+        st.line_chart(df, color=f'#{synergy_stats.get('Color')}')
