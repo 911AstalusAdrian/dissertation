@@ -10,6 +10,7 @@ def get_latest_drivers():
     recent_drivers_list = get_recent_drivers()
     return list(recent_drivers_list)
 
+@st.cache_data(show_spinner='Getting synergy stats...')
 def get_synergy_stats(driver, season):
     synergy_results = get_synergy_metrics(driver, season)
     return synergy_results
