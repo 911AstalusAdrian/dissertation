@@ -3,6 +3,7 @@ import pandas as pd
 
 from src.data_ingestion.openf1_loader import get_recent_drivers
 from src.data_ingestion.fastf1_loader import get_synergy_metrics
+from src.utils.plot_utils import RACE_COLOR, QUALI_COLOR
 
 @st.cache_data(show_spinner='Loading list of recent drivers...')
 def get_latest_drivers():
@@ -49,10 +50,10 @@ if analyse_synergy:
 
         df = pd.DataFrame(plot1_data)
         df.index.name = 'Round'
-        st.line_chart(df)
+        st.line_chart(df, color=[QUALI_COLOR, RACE_COLOR])
     with plot_col2:
         plot2_data = {
             'LapDelta': lap_deltas
         }
-        df = pd.DataFrame(plot2_data)
+        df = pd.DataFrame(plot2_data, color=synergy_stats.get('Color'))
         st.line_chart(df)

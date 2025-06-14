@@ -18,3 +18,6 @@ TEAM_COLORS = {
     'Lotus': '#555555',  # In case 2018 data refers back
     'Caterham': '#009E60'  # Rare/archival
 }
+
+QUALI_COLOR = '#1f77b4'
+RACE_COLOR = '#ff7f0e'
