@@ -7,11 +7,9 @@ import os
 sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '..', '..')))
 # if it's stupid but it works, it ain't stupid
 
-from datetime import datetime, timedelta
-from sklearn.ensemble import RandomForestRegressor
 from sklearn.model_selection import train_test_split
-from sklearn.metrics import r2_score, mean_absolute_error
-from scipy.stats import linregress
+from sklearn.ensemble import RandomForestRegressor
+from sklearn.metrics import root_mean_squared_error
 
 from src.utils.cache import DRIVERS_2018, DRIVERS_2019, DRIVERS_2020, DRIVERS_2021, DRIVERS_2022
 from src.data_ingestion.fastf1_loader import get_synergy_metrics, get_synergy_metrics_for_drivers
@@ -77,9 +75,35 @@ def compute_synergies_for_season():
     except Exception as e:
         print(str(e))
 
-compute_synergies_for_season()
+def data_cleaning(dataframe):
+    # read each csv as a dataframe and concatenate it to the initial dataframe
+    for year in range(2020, 2025):
+        df = pd.read_csv(f'data\\historic_synergies\\historic_data_{year}.csv')
+        dataframe = pd.concat([dataframe, df])
+
+    dataframe = dataframe.dropna(subset=['SynergyScore']) # Remove invalid Synergy scores
+    dataframe = dataframe.loc[dataframe['SynergyScore'] != 0] # Remove rows with Synergy Score 0 (most likely errors)
+    dataframe = dataframe.loc[dataframe['Avg_Q'] != 0] # Remove Qualifying outliers
+    # It is not necessary for the other columns, as there are no zero values (except for DNFRate, where it is possible to be 0)
+
+    return dataframe
+
+def train_model(dataframe):
+    X = dataframe[['Teammate_delta', 'Lap_stdev', 'Avg_Q', 'Avg_R', 'DNFRate']]
+    y = dataframe['SynergyScore']
+
+    X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=42)
+
+    model = RandomForestRegressor(n_estimators=100, random_state=42)
+    model.fit(X_train, y_train)
+
+    predictions = model.predict(X_test)
+    print("Test RMSE: ", root_mean_squared_error(y_test, predictions))
+    print(y_test)
+    print(predictions)
 
 
-# for year in range(2020, 2025):
-#     df = pd.read_csv(f'data\\historic_synergies\\historic_data_{year}.csv')
-#     print(df.head())
+# ,Driver,Season,Teammate_delta,Lap_stdev,Avg_Q,Avg_R,DNFRate,SynergyScore
+df = pd.DataFrame()
+clean_df = data_cleaning(df)
+train_model(clean_df)
