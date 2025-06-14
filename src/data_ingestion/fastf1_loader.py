@@ -638,6 +638,7 @@ def get_synergy_metrics(driver:str = None, season:int = 2025):
     total_deviation = 0
     total_lap_delta = 0
     delta_calculated_races = 0
+    driver_team_color = ''
 
     for round in range (1, 25):
         try:
@@ -676,7 +677,7 @@ def get_synergy_metrics(driver:str = None, season:int = 2025):
                 dnf_count += 1
             race_count += 1
 
-            print(driver_race)
+            driver_team_color = driver_race['TeamColor']
 
             # Compute race lap deviation
             laps = race.laps
@@ -712,6 +713,7 @@ def get_synergy_metrics(driver:str = None, season:int = 2025):
     synergy_results['Q_positions'] = qualifying_positions
     synergy_results['R_positions'] = race_positions
     synergy_results['RaceLapDeltas'] = lap_deltas
+    synergy_results['Color'] = driver_team_color
 
     return synergy_results
 
