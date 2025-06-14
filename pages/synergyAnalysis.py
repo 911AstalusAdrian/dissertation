@@ -56,5 +56,5 @@ if analyse_synergy:
         plot2_data = {
             'LapDelta': lap_deltas
         }
-        df = pd.DataFrame(plot2_data, color=synergy_stats.get('Color'))
-        st.line_chart(df)
+        df = pd.DataFrame(plot2_data)
+        st.line_chart(df, color=synergy_stats.get('Color'))
