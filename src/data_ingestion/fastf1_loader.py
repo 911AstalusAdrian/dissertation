@@ -803,13 +803,15 @@ def get_synergy_metrics_for_drivers(drivers:list = [], season:int = 2025):
 
     for driver in drivers:
         driver_dict = drivers_synergies.get(driver)
+        if driver_dict['delta_calculated_races'] != 0:
+            driver_dict['Teammate_delta'] = driver_dict['total_lap_delta'] / driver_dict['delta_calculated_races']
         if driver_dict['deviation_calculated_races'] != 0:
-            driver_dict['Teammate_delta'] = driver_dict['total_lap_delta'] / driver_dict['deviation_calculated_races']
-        driver_dict['Lap_stdev'] = driver_dict['total_deviation'] / driver_dict['deviation_calculated_races']
+            driver_dict['Lap_stdev'] = driver_dict['total_deviation'] / driver_dict['deviation_calculated_races']
         if driver_dict['quali_count'] != 0:
-            driver_dict['Avg_Q'] = driver_dict['quali_pos'] / driver_dict['quali_count'] 
-        driver_dict['Avg_R'] = driver_dict['race_sum'] / driver_dict['race_count']
-        driver_dict['DNFRate'] = (driver_dict['dnf_count'] * 100) / driver_dict['race_count']
+            driver_dict['Avg_Q'] = driver_dict['quali_pos'] / driver_dict['quali_count']
+        if driver_dict['race_count'] != 0: 
+            driver_dict['Avg_R'] = driver_dict['race_sum'] / driver_dict['race_count']
+            driver_dict['DNFRate'] = (driver_dict['dnf_count'] * 100) / driver_dict['race_count']
 
     return drivers_synergies
                     

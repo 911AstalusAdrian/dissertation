@@ -53,15 +53,12 @@ def compute_historic_synergies():
     # driver_synergy_data_df = pd.DataFrame(driver_season_data)
     # driver_synergy_data_df.to_csv('historic_data.csv')
 
-
 def compute_synergies_for_season():
     driver_season_data = []
-    drivers = DRIVERS_2020
-    season = 2020
+    drivers = DRIVERS_2022
+    season = 2022
     try:
         synergy_metrics = get_synergy_metrics_for_drivers(drivers, season)
-        print("HELLO")
-        print(synergy_metrics)
         for driver in drivers:
             driver_metrics = synergy_metrics.get(driver)
             synergy_score = compute_synergy_score(driver_metrics)
@@ -76,16 +73,13 @@ def compute_synergies_for_season():
                 'SynergyScore': synergy_score
             })
         driver_synergy_data_df = pd.DataFrame(driver_season_data)
-        driver_synergy_data_df.to_csv('historic_data_2020.csv')
+        driver_synergy_data_df.to_csv('historic_data_2021.csv')
     except Exception as e:
         print(str(e))
 
+compute_synergies_for_season()
 
 
-# print(get_drivers_for_season(2024))
-
-# compute_synergies_for_season()
-
-drivers = DRIVERS_2020
-season = 2020
-print(get_synergy_metrics_for_drivers(drivers, season))
+# for year in range(2020, 2025):
+#     df = pd.read_csv(f'data\\historic_synergies\\historic_data_{year}.csv')
+#     print(df.head())
