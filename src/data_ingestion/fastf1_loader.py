@@ -589,22 +589,63 @@ def get_driver_full_info(driver:str = None, starting_season:int = 2018, last_sea
     return driver_info
 
 
+def compute_lap_deviation(laps, driver):
+    # Get laps for the selected driver
+    driver_laps = laps.pick_drivers(driver)
+
+    # Convert laptime from Timedelta to seconds
+    driver_laps['LapTimeSeconds'] = driver_laps['LapTime'].dt.total_seconds()
+    # Filter valid laps only (not in lap, out lap, and laptimes must be accurate)
+    clean_laps = driver_laps[
+        driver_laps['PitInTime'].isnull() & 
+        driver_laps['PitOutTime'].isnull() & 
+        driver_laps['IsAccurate'] & 
+        driver_laps['LapTime'].notnull()
+    ]['LapTimeSeconds']
+    # Perform simple standard deviation
+    laps_std = clean_laps.std()
+    return laps_std
+
+def compute_average_laptime(laps, driver_list):
+
+    driver_averages = []
+
+    for driver in driver_list:
+        driver_laps = laps.pick_drivers(driver)
+        driver_laps['LapTimeSeconds'] = driver_laps['LapTime'].dt.total_seconds()
+        clean_laps = driver_laps[
+        driver_laps['PitInTime'].isnull() & 
+        driver_laps['PitOutTime'].isnull() & 
+        driver_laps['IsAccurate'] & 
+        driver_laps['LapTime'].notnull()
+        ]['LapTimeSeconds']
+        laps_avg = clean_laps.mean()
+        driver_averages.append(laps_avg)
+
+    return driver_averages
+
 def get_synergy_metrics(driver:str = None, season:int = 2025):
 
     synergy_results = {}
     qualifying_positions = {}
     race_positions = {}
+    lap_deltas = {}
     quali_pos = 0
     quali_count = 0
     race_count = 0
     race_sum = 0
     dnf_count = 0
+    total_deviation = 0
+    total_lap_delta = 0
+    delta_calculated_races = 0
 
     for round in range (1, 25):
         try:
 
             # Load Round's Qualifying
             quali = fastf1.get_session(season, round, 'Q')
+            if quali.date > datetime.today():
+                continue
             quali.load(laps=False, telemetry=False, weather=False, messages=False, livedata=False)
             quali_results = quali.results # Get Quali results
             driver_quali = quali_results.loc[quali_results['FullName'] == driver] # Get Driver Quali data
@@ -619,7 +660,9 @@ def get_synergy_metrics(driver:str = None, season:int = 2025):
         try:
             # Load Round's Race
             race = fastf1.get_session(season, round, 'R')
-            race.load(laps=False, telemetry=False, weather=False, messages=False, livedata=False)
+            if race.date > datetime.today():
+                continue
+            race.load()
             race_results = race.results # Get Race results
             driver_race = race_results.loc[race_results['FullName'] == driver] # Get Driver Race data
             driver_race = driver_race.iloc[0]
@@ -632,16 +675,43 @@ def get_synergy_metrics(driver:str = None, season:int = 2025):
             if race_status in DNF_STATUSES:
                 dnf_count += 1
             race_count += 1
+
+            # Compute race lap deviation
+            laps = race.laps
+            driver_abbr = driver_race['Abbreviation']
+            lap_deviation = compute_lap_deviation(laps, driver_abbr)
+            total_deviation += lap_deviation
+
+            # Compute race lap delta to teammate
+            team_id = driver_race['TeamId']
+            teammate_race = race_results.loc[(race_results['TeamId'] == team_id) & (race_results['FullName'] != driver)]
+            if teammate_race.empty:
+                print('No teammate raced')
+                continue
+            teammate_race = teammate_race.iloc[0]
+            teammate_abbr = teammate_race['Abbreviation']
+
+            driver_avg_lap, teammate_avg_lap = compute_average_laptime(laps, [driver_abbr, teammate_abbr])
+            race_delta = driver_avg_lap - teammate_avg_lap
+            total_lap_delta += race_delta
+            delta_calculated_races += 1
+            lap_deltas[round] = race_delta
+
         except Exception as e:
             print(f'Error for race round {round}: {str(e)}')
 
+
+
+    synergy_results['Teammate_delta'] = total_lap_delta / delta_calculated_races
+    synergy_results['Lap_stdev'] = total_deviation/race_count
     synergy_results['Avg_Q'] = quali_pos/quali_count
     synergy_results['Avg_R'] = race_sum/race_count
     synergy_results['DNFRate'] = (dnf_count * 100) / race_count
     synergy_results['Q_positions'] = qualifying_positions
     synergy_results['R_positions'] = race_positions
+    synergy_results['RaceLapDeltas'] = lap_deltas
 
     return synergy_results
 
-# print(get_synergy_metrics('Alexander Albon', 2025))
+print(get_synergy_metrics('Oscar Piastri', 2025))
 # print(metrics.get('R_positions'))
