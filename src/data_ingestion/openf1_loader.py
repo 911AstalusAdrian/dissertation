@@ -158,7 +158,17 @@ def get_recent_drivers(start_year:int = 2023, end_year:int = 2025):
             for driver in race_drivers_list: distinct_drivers.add(driver)
     return distinct_drivers
 
+def get_drivers_for_season(season:int = 2025):
+    drivers_per_season = set()
+    races = get_sessions_list(session_name='Race', year=season)
+    for each_race in races:
+        race_drivers = get_distinct_drivers(session_key=each_race)
+        time.sleep(1)
+        race_drivers['FullName'] = race_drivers['first_name'] + ' ' + race_drivers['last_name']
+        race_drivers_list = race_drivers['FullName'].to_list()
+        for driver in race_drivers_list: drivers_per_season.add(driver)
 
+    return list(drivers_per_season)
 ### Laps calls
 
 def get_laps(driver_number=None, lap_number=None, meeting_key=None, session_key=None):
@@ -192,12 +202,5 @@ def get_teams_for_driver(driver_name=None):
 
     return unique_teams['team_name'].to_list()
 
-# print(get_sessions_list(session_name='Race', year=2023))
 
-
-
-
-# get_active_drivers()
-# drivers = get_distinct_drivers(session_key=9971)
-# drivers['FullName'] = drivers['first_name'] + ' ' + drivers['last_name']
-# print(drivers['FullName'].to_list())
+# print(get_drivers_for_season(2025))
