@@ -713,5 +713,5 @@ def get_synergy_metrics(driver:str = None, season:int = 2025):
 
     return synergy_results
 
-print(get_synergy_metrics('Oscar Piastri', 2025))
+# print(get_synergy_metrics('Oscar Piastri', 2025))
 # print(metrics.get('R_positions'))
