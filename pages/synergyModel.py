@@ -5,6 +5,7 @@ from datetime import datetime
 
 from src.data_ingestion.openf1_loader import get_drivers_for_season
 from src.data_ingestion.fastf1_loader import get_synergy_metrics
+from src.utils.plot_utils import DRIVER_SYNERGY_COLOR, BEST_SYNERGY_COLOR, AVG_SYNERGY_COLOR
 
 @st.cache_data
 def get_historic_synergies():
@@ -39,27 +40,16 @@ def get_latest_season_drivers():
     drivers_list = get_drivers_for_season(latest_season)
     return drivers_list
 
-def plot_driver_synergies(selected_driver, df):
-    seasons = sorted(df['Season'].unique())
-    driver_synergy = df[df['Driver'] == selected_driver].set_index('Season').reindex(seasons)['SynergyScore']
-    avg_synergy = df.groupby('Season')['SynergyScore'].mean().reindex(seasons)
-    best_synergy = df.groupby('Season')['SynergyScore'].max().reindex(seasons)
+def plot_driver_synergies(driver, data):
+    avg_synergy = data.groupby('Season')['SynergyScore'].mean().rename('Average')
+    max_synergy = data.groupby('Season')['SynergyScore'].max().rename('Best')
+    driver_synergy = data[data['Driver'] == driver].set_index('Season')['SynergyScore'].rename(driver)
 
-    # Plot
-    fig, ax = plt.subplots(figsize=(8, 5))
-    ax.plot(seasons, driver_synergy, label=selected_driver, marker='o')
-    ax.plot(seasons, avg_synergy, linestyle='dotted', color='gray', label='Average Synergy')
-    ax.plot(seasons, best_synergy, linewidth=3, color='green', label='Best Synergy')
 
-    # Labels and title
-    ax.set_title(f'Synergy Trends: {selected_driver} vs Average and Best')
-    ax.set_xlabel('Season')
-    ax.set_ylabel('Synergy Score')
-    ax.set_ylim(0, 100)
-    ax.legend()
+    synergy_plot_df = pd.concat([driver_synergy, avg_synergy, max_synergy], axis=1)
+    synergy_plot_df = synergy_plot_df.sort_index()
+    st.line_chart(synergy_plot_df, color=[DRIVER_SYNERGY_COLOR, AVG_SYNERGY_COLOR, BEST_SYNERGY_COLOR])
 
-    # Show in Streamlit
-    st.pyplot(fig)
 
 drivers_list = get_latest_season_drivers()
 data = get_historic_synergies() 
