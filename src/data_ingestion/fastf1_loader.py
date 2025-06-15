@@ -814,26 +814,6 @@ def get_synergy_metrics_for_drivers(drivers:list = [], season:int = 2025):
             driver_dict['DNFRate'] = (driver_dict['dnf_count'] * 100) / driver_dict['race_count']
 
     return drivers_synergies
-                    
-
-
-# print(get_synergy_metrics_for_drivers(
-#     drivers=['Yuki Tsunoda', 'Jack Doohan', 'George Russell', 'Sergio Perez', 'Franco Colapinto', 'Liam Lawson', 'Kevin Magnussen', 'Charles Leclerc'],
-#     season=2024
-# ))
-
-
-# print(get_synergy_metrics_for_drivers(['Oscar Piastri', 'Max Verstappen', 'Jack Doohan'], season=2025))
-# print(get_synergy_metrics('Oscar Piastri', 2025))
-
-# race = fastf1.get_session(2025, 1, 'R')
-# race.load()
-# laps = race.laps
-# doo_laps = laps.pick_drivers('DOO')
-# print(doo_laps)
-
-# teammate_delta, lap_stdev
-# race_lap_deltas
 
 
 # TELEMETRY DATA
