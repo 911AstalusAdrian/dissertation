@@ -31,7 +31,7 @@ def plot_top_synergies(synergy_df, top=10):
 data = get_historic_synergies()
 st.dataframe(data)
 
-plot_col1, plot_col2 = st.colums(2)
+plot_col1, plot_col2 = st.columns(2)
 with plot_col1:
     plot_synergy_level_distribution(data)
 with plot_col2:
