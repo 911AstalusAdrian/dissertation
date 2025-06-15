@@ -61,38 +61,37 @@ def show_weights():
 
 def update_weights(text):
     int_list = [int(i) for i in text.split(',')]
-    st.toast(int_list)
-    # set_weights(int_list[0],int_list[1],int_list[2],int_list[3],int_list[4])
+    set_weights(int_list[0],int_list[1],int_list[2],int_list[3],int_list[4])
 
-# drivers_list = get_latest_season_drivers()
-# data = get_historic_synergies() 
-# driver = st.sidebar.selectbox('Pick a driver', options=drivers_list)
-# show_model_stats = st.sidebar.button('Show model stats')
+drivers_list = get_latest_season_drivers()
+data = get_historic_synergies() 
+driver = st.sidebar.selectbox('Pick a driver', options=drivers_list)
+show_model_stats = st.sidebar.button('Show model stats')
 
 text = st.sidebar.text_input('weights')
 button = st.sidebar.button('Update weights', on_click=update_weights, args=(text,))
   
-# if show_model_stats:
-#     st.dataframe(data)
-#     st.divider()
-#     st.markdown('Feature weights for the current model')
-#     show_weights()
+if show_model_stats:
+    st.dataframe(data)
+    st.divider()
+    st.markdown('Feature weights for the current model')
+    show_weights()
     
-#     teammate_col, lap_col, q_col, r_col, dnf_col = st.columns(5)
-#     teammate_delta = teammate_col.number_input('Teammate Delta', value=1.0, min_value=0.0, max_value=5.0, step=0.1)
-#     lap_stdev = lap_col.number_input('Lap stdev', value=1.0, min_value=0.0, max_value=5.0, step=0.1)
-#     avg_q = q_col.number_input('Avg Quali', value=1.0, min_value=0.0, max_value=5.0, step=0.1)
-#     avg_r = r_col.number_input('Avg Race', value=1.0, min_value=0.0, max_value=5.0, step=0.1)
-#     dnf_rate = dnf_col.number_input('DNF Rate', value=1.0, min_value=0.0, max_value=5.0, step=0.1)
+    teammate_col, lap_col, q_col, r_col, dnf_col = st.columns(5)
+    teammate_delta = teammate_col.number_input('Teammate Delta', value=1.0, min_value=0.0, max_value=5.0, step=0.1)
+    lap_stdev = lap_col.number_input('Lap stdev', value=1.0, min_value=0.0, max_value=5.0, step=0.1)
+    avg_q = q_col.number_input('Avg Quali', value=1.0, min_value=0.0, max_value=5.0, step=0.1)
+    avg_r = r_col.number_input('Avg Race', value=1.0, min_value=0.0, max_value=5.0, step=0.1)
+    dnf_rate = dnf_col.number_input('DNF Rate', value=1.0, min_value=0.0, max_value=5.0, step=0.1)
     
-#     st.divider()
-#     plot_col1, plot_col2 = st.columns([1,2])
-#     with plot_col1:
-#         st.markdown('Distribution of synergy levels over the dataset')
-#         plot_synergy_level_distribution(data)
-#     with plot_col2:
-#         st.markdown('Top ten synergy levels from the dataset')
-#         plot_top_synergies(data, top=10)
-#     st.divider()
-#     st.markdown('Driver Synergy levels compared to the best and average over the seasons')
-#     plot_driver_synergies(driver, data)
+    st.divider()
+    plot_col1, plot_col2 = st.columns([1,2])
+    with plot_col1:
+        st.markdown('Distribution of synergy levels over the dataset')
+        plot_synergy_level_distribution(data)
+    with plot_col2:
+        st.markdown('Top ten synergy levels from the dataset')
+        plot_top_synergies(data, top=10)
+    st.divider()
+    st.markdown('Driver Synergy levels compared to the best and average over the seasons')
+    plot_driver_synergies(driver, data)
