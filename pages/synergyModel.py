@@ -36,20 +36,27 @@ def plot_top_synergies(synergy_df, top=10):
     print(top_synergies)
     st.bar_chart(top_synergies[['SynergyScore']], horizontal=True)
 
-
 def get_latest_season_drivers():
     latest_season = datetime.today().year
     drivers_list = get_drivers_for_season(latest_season)
     return drivers_list
 
+def plot_driver_synergies(driver, data):
+    driver_synergies = data.loc[data['Driver'] == driver]
+    driver_synergies = driver_synergies.set_index('Season')
+    st.line_chart(driver_synergies, x=driver_synergies['Season'], y=driver_synergies['SynergyScore'])
+
+
 drivers_list = get_latest_season_drivers()
+data = get_historic_synergies() 
 driver = st.sidebar.selectbox('Pick a driver', options=drivers_list)
 show_driver_button = st.sidebar.button('Show Driver Synergy')
 show_model_stats = st.sidebar.button('SHow model stats')
 
 
+
+
 if show_model_stats:
-    data = get_historic_synergies()
     st.dataframe(data)
     plot_col1, plot_col2 = st.columns([1,2])
     with plot_col1:
