@@ -14,20 +14,20 @@ def get_historic_synergies():
     data['SynergyLevel'] = pd.cut(data['SynergyScore'], bins=bins, labels=labels, right=True)
     return data
 
+def plot_synergy_level_distribution(synergy_df):
+    synergy_counts = synergy_df['SynergyLevel'].value_counts().sort_index()
+    df = synergy_counts.reset_index()
+    df.columns = ['SynergyLevel', 'Count']
+    df = df.set_index('SynergyLevel')
+    st.bar_chart(df)
+
+def plot_top_synergies(synergy_df, top=10):
+    top_synergies = synergy_df.nlargest(top, 'SynergyScore')
+    top_synergies = top_synergies.sort_values('SynergyScores')
+    st.dataframe(top_synergies)
+
 
 data = get_historic_synergies()
-synergy_counts = data['SynergyLevel'].value_counts().sort_index()
-
 st.dataframe(data)
-
-synergy_df = synergy_counts.reset_index()
-synergy_df.columns = ['SynergyLevel', 'Count']
-synergy_df = synergy_df.set_index('SynergyLevel')
-st.bar_chart(synergy_df)
-
-# Score Range	Class Label
-# 85 – 100	⭐ Excellent
-# 70 – 84	👍 Good
-# 50 – 69	⚖️ Moderate
-# 30 – 49	⚠️ Poor
-# 1 – 29	❌ Very Poor
+plot_synergy_level_distribution(data)
+plot_top_synergies(data, top=10)
