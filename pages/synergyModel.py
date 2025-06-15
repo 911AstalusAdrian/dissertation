@@ -62,7 +62,7 @@ def show_weights():
 def update_weights(text):
     int_list = [int(i) for i in text.split(',')]
     st.toast(int_list)
-    set_weights(int_list[0],int_list[1],int_list[2],int_list[3],int_list[4])
+    # set_weights(int_list[0],int_list[1],int_list[2],int_list[3],int_list[4])
 
 # drivers_list = get_latest_season_drivers()
 # data = get_historic_synergies() 
@@ -70,7 +70,7 @@ def update_weights(text):
 # show_model_stats = st.sidebar.button('Show model stats')
 
 text = st.sidebar.text_input('weights')
-button = st.sidebar.button('Update weights', on_click=update_weights, args=text)
+button = st.sidebar.button('Update weights', on_click=update_weights, args=(text,))
   
 # if show_model_stats:
 #     st.dataframe(data)
