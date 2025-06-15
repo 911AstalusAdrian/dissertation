@@ -1,10 +1,10 @@
 import streamlit as st
 import pandas as pd
 import numpy as np
+from datetime import datetime
 
-# from src.data_ingestion.openf1_loader import get_recent_drivers
-# from src.data_ingestion.fastf1_loader import get_synergy_metrics
-# from src.utils.plot_utils import RACE_COLOR, QUALI_COLOR
+from src.data_ingestion.openf1_loader import get_drivers_for_season
+from src.data_ingestion.fastf1_loader import get_synergy_metrics
 
 @st.cache_data
 def get_historic_synergies():
@@ -36,13 +36,29 @@ def plot_top_synergies(synergy_df, top=10):
     print(top_synergies)
     st.bar_chart(top_synergies[['SynergyScore']], horizontal=True)
 
-data = get_historic_synergies()
-st.dataframe(data)
 
-plot_col1, plot_col2 = st.columns([1,2])
-with plot_col1:
-    st.markdown('Distribution of synergy levels over the dataset')
-    plot_synergy_level_distribution(data)
-with plot_col2:
-    st.markdown('Top ten synergy levels from the dataset')
-    plot_top_synergies(data, top=10)
+def get_latest_season_drivers():
+    latest_season = datetime.today().year
+    drivers_list = get_drivers_for_season(latest_season)
+    return drivers_list
+
+
+drivers_list = get_latest_season_drivers
+driver = st.sidebar.selectbox('Pick a driver', options=drivers_list)
+show_driver_button = st.sidebar.button('Show Driver Synergy')
+show_model_stats = st.sidebar.button('SHow model stats')
+
+
+if show_model_stats:
+    data = get_historic_synergies()
+    st.dataframe(data)
+    plot_col1, plot_col2 = st.columns([1,2])
+    with plot_col1:
+        st.markdown('Distribution of synergy levels over the dataset')
+        plot_synergy_level_distribution(data)
+    with plot_col2:
+        st.markdown('Top ten synergy levels from the dataset')
+        plot_top_synergies(data, top=10)
+
+if show_driver_button:
+    st.markdown('Hi')
