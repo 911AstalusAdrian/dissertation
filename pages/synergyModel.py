@@ -21,11 +21,19 @@ def plot_synergy_level_distribution(synergy_df):
     df = df.set_index('SynergyLevel')
     st.bar_chart(df)
 
+def first_last_initials(full_name):
+    parts = full_name.split()
+    if len(parts) == 1:
+        return parts[0][0].upper()
+    return parts[0][0].upper() + parts[-1][0].upper()
+
 def plot_top_synergies(synergy_df, top=10):
     top_synergies = synergy_df.nlargest(top, 'SynergyScore')
-    top_synergies['DriverSeason'] = top_synergies['Driver'] + ' (' + top_synergies['Season'].astype(str) + ')'
+    top_synergies['Initials'] = top_synergies['Driver'].apply(first_last_initials)
+    top_synergies['DriverSeason'] = top_synergies['Initials'] + ' (' + top_synergies['Season'].astype(str) + ')'
     top_synergies = top_synergies.set_index('DriverSeason')
-    top_synergies = top_synergies.sort_values('SynergyScore', ascending=False)
+
+    print(top_synergies)
     st.bar_chart(top_synergies[['SynergyScore']], horizontal=True)
 
 data = get_historic_synergies()
@@ -38,7 +46,3 @@ with plot_col1:
 with plot_col2:
     st.markdown('Top ten synergy levels from the dataset')
     plot_top_synergies(data, top=10)
-
-
-# data = get_historic_synergies()
-# plot_top_synergies(data, top=10)
