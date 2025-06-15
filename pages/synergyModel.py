@@ -64,11 +64,11 @@ driver = st.sidebar.selectbox('Pick a driver', options=drivers_list)
 show_model_stats = st.sidebar.button('Show model stats')
 
 
-teammate_delta = st.sidebar.number_input('Teammate Delta', min_value=0, max_value=5, step=0.1)
-lap_stdev = st.sidebar.number_input('Lap stdev', min_value=0, max_value=5, step=0.1)
-avg_q = st.sidebar.number_input('Avg Quali', min_value=0, max_value=5, step=0.1)
-avg_r = st.sidebar.number_input('Avg Race', min_value=0, max_value=5, step=0.1)
-dnf_rate = st.sidebar.number_input('DNF Rate', min_value=0, max_value=5, step=0.1)
+teammate_delta = st.sidebar.number_input('Teammate Delta', value = 1.0, min_value=0.0, max_value=5.0, step=0.1)
+lap_stdev = st.sidebar.number_input('Lap stdev', value = 1.0, min_value=0.0, max_value=5.0, step=0.1)
+avg_q = st.sidebar.number_input('Avg Quali', value = 1.0, min_value=0.0, max_value=5.0, step=0.1)
+avg_r = st.sidebar.number_input('Avg Race', value = 1.0, min_value=0.0, max_value=5.0, step=0.1)
+dnf_rate = st.sidebar.number_input('DNF Rate', value = 1.0, min_value=0.0, max_value=5.0, step=0.1)
 
   
 if show_model_stats:
