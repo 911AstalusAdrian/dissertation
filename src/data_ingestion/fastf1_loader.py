@@ -1,7 +1,6 @@
 # Responsible for loading the data from the FastF1 Python package
 import fastf1
 import pandas as pd
-import numpy as np
 import time
 
 from datetime import timedelta, datetime
@@ -180,74 +179,6 @@ def get_distinct_drivers(first_season = 2018, last_season = 2025):
 
     return sorted(all_drivers)
 
-# def get_driver_stats_multiseason(driver_full_name: str, start_year: int = 2018, end_year: int = None) -> dict:  
-#     if end_year is None:
-#         end_year = datetime.now().year
-
-#     stats = {
-#         'Name': driver_full_name,
-#         'Races': 0,
-#         'Finished': 0,
-#         'DNFs': 0,
-#         'Wins': 0,
-#         'Podiums': 0,
-#         'Points': 0.0,
-#         'Teams': set()
-#     }
-
-#     for year in range(start_year, end_year + 1):
-#         try:
-#             schedule = fastf1.get_event_schedule(year)
-#             # SCHEDULE_CACHE[year] = schedule
-#         except Exception as e:
-#             print(f"Skipping year {year}: {e}")
-#             continue
-
-#         for _, row in schedule.iterrows():
-#             if row['Session5'] != 'Race':
-#                 continue  # Only care about race sessions
-
-#             try:
-#                 session = fastf1.get_session(year, row['EventName'], 'R')
-#                 session.load(telemetry=False, weather=False, messages=False, livedata=False)
-#                 time.sleep(1)
-#                 results = session.results
-#                 if results is None or results.empty:
-#                     continue
-
-#                 driver_row = results[results['FullName'] == driver_full_name]
-#                 if driver_row.empty:
-#                     continue
-
-#                 dr = driver_row.iloc[0]
-
-#                 stats['Races'] += 1
-#                 stats['Points'] += dr.get('Points', 0.0) or 0.0
-#                 stats['Teams'].add(dr['TeamName'])
-
-#                 if isinstance(dr['Status'], str) and 'Finished' in dr['Status']:
-#                     stats['Finished'] += 1
-#                 else:
-#                     stats['DNFs'] += 1
-
-#                 if dr['Position'] == 1:
-#                     stats['Wins'] += 1
-#                     stats['Podiums'] += 1
-#                 elif dr['Position'] in [2, 3]:
-#                     stats['Podiums'] += 1
-
-#             except Exception as e:
-#                 print(f"Failed to process race {row['EventName']} in {year}: {e}")
-#                 continue
-
-#             # time.sleep(1)
-
-#     stats['Points'] = round(stats['Points'], 1)
-#     stats['Avg Points/Race'] = round(stats['Points'] / stats['Races'], 2) if stats['Races'] > 0 else 0.0
-#     stats['Teams'] = sorted(stats['Teams'])
-
-#     return stats
-
 def get_events_for_season(season:int = 2025):
     # schedule = SCHEDULE_CACHE.get(season)
     # if schedule is None:
@@ -284,49 +215,6 @@ def get_average_quali_pos(driver:str = None, season:int = 2025, season_races:lis
 
     return sum(quali_results_for_driver) / len(quali_results_for_driver)
                 
-# def get_race_results_over_seasons(driver:str = None, starting_season:int = 2018, last_season:int = 2025):
-
-#     driver_results = []
-
-#     for year in range(starting_season, last_season + 1):
-#         schedule = fastf1.get_event_schedule(year)
-#         # schedule = SCHEDULE_CACHE.get(year)
-#         # if schedule is None:
-#         #     schedule = fastf1.get_event_schedule(year)
-#     # cleaning the schedule (remove testing 
-#         for _, event in schedule.iterrows():
-#             try:
-#                 # Get and Load race results
-#                 race = event.get_race()
-#                 race.load(laps=False, telemetry=False, weather=False, messages=False, livedata=False)
-#                 race_results = race.results
-
-#                 # Error handling in case results is empty
-#                 if race_results is None or race_results.empty:
-#                     continue
-
-#                 # Get race result for a specific driver + error handling
-#                 driver_result = race_results.loc[race_results['FullName'] == driver]
-#                 if driver_result is None or driver_result.empty:
-#                     continue
-
-#                 dr = driver_result.iloc[0]
-#                 driver_results.append({
-#                     'Season': year,
-#                     'RaceName': event['EventName'],
-#                     # 'FullName': dr['FullName'],
-#                     'TeamName': dr['TeamName'],
-#                     'Position': dr['Position'],
-#                     'Points': dr['Points']
-#                 })
-#             except Exception as e:
-#                 print(f'Error in {event['EventName']} - {year}: {e}')
-#                 continue
-
-
-#     driver_results_df = pd.DataFrame(driver_results)
-#     return driver_results_df
-
 def calculate_quali_teammate_delta(driver_res, teammate_res):
     if not pd.notna(driver_res['Q3']):
         if not pd.notna(driver_res['Q2']):
@@ -359,87 +247,6 @@ def calculate_quali_teammate_delta(driver_res, teammate_res):
 
     if abs(delta_seconds ) > 5: return 0.0
     return delta_seconds
-
-# def calculate_race_teammate_h2h(driver_res, teammate_res):
-#     return driver_res['Position'] - teammate_res['Position']
-
-# def get_driver_teammate_comparison_over_seasons(driver:str = None, starting_season:int = 2018, last_season:int = 2025):
-
-#     teammate_comparisons = []
-
-#     for year in range(starting_season, last_season + 1):
-#         quali_count = 0
-#         quali_delta = 0
-#         quali_for = 0
-#         quali_against = 0
-#         race_for = 0
-#         race_against = 0
-#         sessions = get_events_for_season(year)
-#         for _, session in sessions.iterrows():
-
-#             try:
-#                 # Race H2H calculations
-#                 race = session.get_race()
-#                 race.load(laps=False, telemetry=False, weather=False, messages=False, livedata=False)
-#                 race_results = race.results
-
-#                 driver_race_res = race_results.loc[race_results['FullName'] == driver]
-#                 driver_race_res = driver_race_res.iloc[0]
-
-#                 team_name = driver_race_res['TeamId']
-                
-#                 teammate_race_res = race_results.loc[(race_results['TeamId'] == team_name) & (race_results['FullName'] != driver)]
-#                 teammate_race_res = teammate_race_res.iloc[0]
-
-#                 teammate_pos_diff = calculate_race_teammate_h2h(driver_race_res, teammate_race_res)
-#                 if teammate_pos_diff < 0: race_for += 1
-#                 else: race_against += 1
-
-#                 time.sleep(0.5)
-
-#                 # Qualifying H2H calculations
-#                 quali = session.get_qualifying()
-#                 quali.load(laps=False, telemetry=False, weather=False, messages=False, livedata=False)
-#                 quali_results = quali.results
-
-#                 driver_quali_res = quali_results.loc[quali_results['FullName'] == driver]
-#                 driver_quali_res = driver_quali_res.iloc[0]
-
-#                 teammate_quali_res = quali_results.loc[(quali_results['TeamId'] == team_name) & (quali_results['FullName'] != driver)]
-#                 teammate_quali_res = teammate_quali_res.iloc[0]
-
-#                 # Not taking into consideration weather changes during Quali (ex: Canada 2023)
-#                 # For differences in delta > 5 we mark them with 0 (invalid quali)
-#                 teammate_delta = calculate_quali_teammate_delta(driver_quali_res, teammate_quali_res)
-#                 if teammate_delta != timedelta(seconds=0).total_seconds():
-#                     if teammate_delta > pd.Timedelta(0).total_seconds(): quali_against += 1
-#                     else: quali_for += 1
-#                     quali_count += 1
-#                     quali_delta += teammate_delta
-
-#             except Exception as e:
-#                 print(f'ERROR! {year} {session['EventName']} - {repr(e)}')
-#                 time.sleep(2)
-#                 continue
-        
-#         if quali_count != 0:
-#             teammate_comparisons.append({
-#                 'Season': year,
-#                 'QualiDelta': quali_delta / quali_count,
-#                 'QualiFor': quali_for,
-#                 'QualiAgainst': quali_against,
-#                 'RaceFor': race_for,    
-#                 'RaceAgainst': race_against
-#             })
-
-#     teammate_comparisons_df = pd.DataFrame(teammate_comparisons)
-#     return teammate_comparisons_df
-
-# races = get_event_names_for_season(2025)
-# print(get_average_quali_pos('Max VERSTAPPEN', 2025, races))
-# print(get_race_results_over_seasons('Oscar Piastri', 2025, 2025))
-# print(get_driver_teammate_comparison_over_seasons('Alexander Albon', 2018, 2025))
-
 
 def get_driver_full_info(driver:str = None, starting_season:int = 2018, last_season:int = 2025):
     driver_info = {
@@ -588,7 +395,6 @@ def get_driver_full_info(driver:str = None, starting_season:int = 2018, last_sea
     driver_info['Comparisons'] = comparisons_df
     return driver_info
 
-
 def compute_lap_deviation(laps, driver):
     # Get laps for the selected driver
     driver_laps = laps.pick_drivers(driver)
@@ -626,7 +432,6 @@ def compute_average_laptime(laps, driver_list):
             return [0 ,0]
         laps_avg = clean_laps.mean()
         driver_averages.append(laps_avg)
-    # print(f'DRIVER AVERAGES: {driver_averages}')
     return driver_averages
 
 def get_synergy_metrics(driver:str = None, season:int = 2025):
@@ -815,18 +620,62 @@ def get_synergy_metrics_for_drivers(drivers:list = [], season:int = 2025):
 
     return drivers_synergies
 
+def compute_synergy_score(metrics: dict) -> float:
+    score = (
+        -metrics['Teammate_delta'] * 2.0 +      # negative delta = faster than teammate
+        -metrics['Lap_stdev'] * 1.5 +           # lower std dev = more consistent
+        -metrics['Avg_Q'] * 0.5 +               # higher qual = better driver performance
+        -metrics['Avg_R'] * 1.0 +               # higher race position = better result
+        -metrics['DNFRate'] * 3.0               # fewer DNFs = more reliable
+    )
+    return score
 
-# TELEMETRY DATA
-# race = fastf1.get_session(2025, 1, 'R')
-# race.load()
-# laps = race.laps
-# pia_laps = laps.pick_drivers('PIA')
-# for _, lap in pia_laps.iterrows():
-#     print(lap['LapNumber'])
-#     if lap['LapNumber'] == 1:
-#         telemetry = lap.get_telemetry()
-#         throttle = telemetry['Throttle']
-#         rpm = telemetry['RPM']
-#         print(throttle.mean())
-#         print(rpm.mean())
-#         print(telemetry[['Speed', 'RPM', 'Throttle', 'Brake']])
+def get_driver_synergy_per_race(drivername:str=None, starting_season:int=2020, final_season:int=2025):
+    drivername = 'Lewis Hamilton'
+    driver_synergies = []
+    for year in range(2021, 2025):
+        events = fastf1.get_event_schedule(year)
+        for race_index, event in events.iterrows():
+            if event['EventFormat'] != 'testing':
+                race = event.get_race()
+                race.load()
+                race_results = race.results
+                driver_res = race_results.loc[race_results['FullName'] == drivername]
+                if not driver_res.empty:
+
+                    stats = {
+                        'Teammate_delta' : 0,
+                        'Lap_stdev': 0,
+                        'Avg_Q': 0,
+                        'Avg_R': 0,
+                        'DNFRate': 0
+                    }
+
+                    driver_res = driver_res.iloc[0]
+                    team_id = driver_res['TeamId']
+
+                    teammate_res = race_results.loc[(race_results['TeamId'] == team_id) & (race_results['FullName'] != drivername)]
+                    if teammate_res.empty:
+                        continue
+                    teammate_res = teammate_res.iloc[0]
+
+                    teammate_abbr = teammate_res['Abbreviation']
+                    driver_abbr = driver_res['Abbreviation']
+                    race_laps = race.laps
+                    driver_avg, teammate_avg = compute_average_laptime(race_laps, [driver_abbr, teammate_abbr])
+                    driver_stdev = compute_lap_deviation(race_laps, driver_abbr)
+                    stats['Lap_stdev'] = driver_stdev
+                    race_delta = driver_avg - teammate_avg
+                    if race_delta != 0:
+                        stats['Teammate_delta'] = race_delta
+                    stats['Avg_Q'] = driver_res['GridPosition']
+                    stats['Avg_R'] = driver_res['Position']
+                    if driver_res['Status'] in DNF_STATUSES: stats['DNFRate'] = 1
+                    else: stats['DNFRate'] = 0
+
+                    synergy = compute_synergy_score(stats)
+                    stats['Season'] = year
+                    stats['Round'] = race_index
+                    stats['Synergy'] = synergy
+                    driver_synergies.append(stats)
+    return driver_synergies

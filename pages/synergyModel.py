@@ -1,10 +1,8 @@
 import streamlit as st
 import pandas as pd
-import matplotlib.pyplot as plt
 from datetime import datetime
 
 from src.data_ingestion.openf1_loader import get_drivers_for_season
-from src.data_ingestion.fastf1_loader import get_synergy_metrics
 from src.model.model import get_weights, set_weights, recalculate_synergy
 from src.utils.plot_utils import DRIVER_SYNERGY_COLOR, BEST_SYNERGY_COLOR, AVG_SYNERGY_COLOR
 

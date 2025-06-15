@@ -3,9 +3,6 @@ import numpy as np
 import sys
 import os
 
-sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '..', '..')))
-# if it's stupid but it works, it ain't stupid
-
 from sklearn.model_selection import train_test_split
 from sklearn.ensemble import RandomForestRegressor
 from sklearn.metrics import root_mean_squared_error
@@ -147,10 +144,3 @@ def recalculate_synergy():
 def set_weights_and_update_synergy(weights_list):
     set_weights(weights_list[0], weights_list[1], weights_list[2], weights_list[3], weights_list[4])
     recalculate_synergy()
-
-# set_weights_and_update_synergy([1.0, 2.0, 0.5, 1.5, 0.5])
-# recalculate_synergy()
-# # ,Driver,Season,Teammate_delta,Lap_stdev,Avg_Q,Avg_R,DNFRate,SynergyScore
-# df = pd.DataFrame()
-# clean_df = data_cleaning(df)
-# train_model(clean_df)
