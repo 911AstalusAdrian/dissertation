@@ -67,4 +67,4 @@ if show_model_stats:
         plot_top_synergies(data, top=10)
 
 if show_driver_button:
-    st.markdown('Hi')
+    plot_driver_synergies(driver, data)
