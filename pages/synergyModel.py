@@ -42,8 +42,7 @@ def get_latest_season_drivers():
     drivers_list = get_drivers_for_season(latest_season)
     return drivers_list
 
-
-drivers_list = get_latest_season_drivers
+drivers_list = get_latest_season_drivers()
 driver = st.sidebar.selectbox('Pick a driver', options=drivers_list)
 show_driver_button = st.sidebar.button('Show Driver Synergy')
 show_model_stats = st.sidebar.button('SHow model stats')
