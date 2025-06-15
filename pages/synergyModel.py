@@ -16,7 +16,14 @@ def get_historic_synergies():
 
 
 data = get_historic_synergies()
+synergy_counts = data['SynergyLevel'].value_counts().sort_index()
+
 st.dataframe(data)
+
+synergy_df = synergy_counts.reset_index()
+synergy_df.columns = ['SynergyLevel', 'Count']
+synergy_df = synergy_df.set_index('SynergyLevel')
+st.bar_chart(synergy_df)
 
 # Score Range	Class Label
 # 85 – 100	⭐ Excellent
