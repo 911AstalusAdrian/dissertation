@@ -33,8 +33,10 @@ st.dataframe(data)
 
 plot_col1, plot_col2 = st.columns(2)
 with plot_col1:
+    st.markdown('Distribution of synergy levels over the dataset')
     plot_synergy_level_distribution(data)
 with plot_col2:
+    st.markdown('Top ten synergy levels from the dataset')
     plot_top_synergies(data, top=10)
 
 
