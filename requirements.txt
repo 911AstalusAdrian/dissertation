@@ -4,3 +4,6 @@ numpy
 fastf1
 plotly
 matplotlib
+sklearn.model_selection
+sklearn.ensemble
+sklearn.metrics
