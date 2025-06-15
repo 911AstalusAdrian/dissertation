@@ -69,7 +69,7 @@ driver = st.sidebar.selectbox('Pick a driver', options=drivers_list)
 show_model_stats = st.sidebar.button('Show model stats')
 
 text = st.sidebar.text_input('weights')
-button = st.sidebar.button('Update weights', on_click=update_weights(text))
+button = st.sidebar.button('Update weights', on_click=update_weights, args=text)
   
 if show_model_stats:
     st.dataframe(data)
