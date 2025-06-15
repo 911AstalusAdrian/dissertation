@@ -23,7 +23,12 @@ def plot_synergy_level_distribution(synergy_df):
 
 def plot_top_synergies(synergy_df, top=10):
     top_synergies = synergy_df.nlargest(top, 'SynergyScore')
-    top_synergies = top_synergies.sort_values('SynergyScores')
+    top_synergies = top_synergies.sort_values('SynergyScore')
+    top_synergies['Label'] = f'{top_synergies['Driver']} ({top_synergies['Season']})'
+
+    top_synergies.columns = ['Label', 'SynergyScore']
+    top_synergies.set_index('SynergyScore')
+    st.bar_chart(top_synergies, horizontal=True)
     st.dataframe(top_synergies)
 
 
