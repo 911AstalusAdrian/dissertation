@@ -44,7 +44,7 @@ def get_latest_season_drivers():
 def plot_driver_synergies(driver, data):
     driver_synergies = data.loc[data['Driver'] == driver]
     driver_synergies = driver_synergies.set_index('Season')
-    st.line_chart(driver_synergies, x=driver_synergies['Season'], y=driver_synergies['SynergyScore'])
+    st.line_chart(driver_synergies[['SynergyScore']])
 
 
 drivers_list = get_latest_season_drivers()
