@@ -42,9 +42,17 @@ def get_latest_season_drivers():
     return drivers_list
 
 def plot_driver_synergies(driver, data):
-    driver_synergies = data.loc[data['Driver'] == driver]
-    driver_synergies = driver_synergies.set_index('Season')
-    st.line_chart(driver_synergies[['SynergyScore']])
+    # driver_synergies = data.loc[data['Driver'] == driver]
+    # driver_synergies = driver_synergies.set_index('Season')
+
+    avg_synergy = data.groupby('Season')['SynergyScore'].mean().rename('Average')
+    max_synergy = data.groupby('Season')['SynergyScore'].max().rename('Best')
+    driver_synergy = data[data['Driver'] == driver].set_index('Season')['SynergyScore'].rename(driver)
+
+
+    synergy_plot_df = pd.concat([driver_synergy, avg_synergy, max_synergy], axis=1)
+    synergy_plot_df = synergy_plot_df.sort_index()
+    st.line_chart(synergy_plot_df)
 
 
 drivers_list = get_latest_season_drivers()
