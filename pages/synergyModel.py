@@ -76,15 +76,7 @@ if show_model_stats:
     st.dataframe(data)
     st.divider()
     st.markdown('Feature weights for the current model')
-    show_weights()
-    
-    teammate_col, lap_col, q_col, r_col, dnf_col = st.columns(5)
-    teammate_delta = teammate_col.number_input('Teammate Delta', value=1.0, min_value=0.0, max_value=5.0, step=0.1)
-    lap_stdev = lap_col.number_input('Lap stdev', value=1.0, min_value=0.0, max_value=5.0, step=0.1)
-    avg_q = q_col.number_input('Avg Quali', value=1.0, min_value=0.0, max_value=5.0, step=0.1)
-    avg_r = r_col.number_input('Avg Race', value=1.0, min_value=0.0, max_value=5.0, step=0.1)
-    dnf_rate = dnf_col.number_input('DNF Rate', value=1.0, min_value=0.0, max_value=5.0, step=0.1)
-    
+    show_weights() 
     st.divider()
     plot_col1, plot_col2 = st.columns([1,2])
     with plot_col1:
