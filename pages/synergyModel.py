@@ -51,12 +51,6 @@ def plot_driver_synergies(driver, data):
     synergy_plot_df = synergy_plot_df.sort_index()
     st.line_chart(synergy_plot_df, color=[DRIVER_SYNERGY_COLOR, AVG_SYNERGY_COLOR, BEST_SYNERGY_COLOR])
 
-
-drivers_list = get_latest_season_drivers()
-data = get_historic_synergies() 
-driver = st.sidebar.selectbox('Pick a driver', options=drivers_list)
-show_model_stats = st.sidebar.button('Show model stats')
-
 def show_weights():
     weights = get_weights()
     weight_metrics = list(weights.keys())
@@ -64,9 +58,25 @@ def show_weights():
     for index, metric in enumerate(weight_metrics):
         cols[index].metric(metric, weights[metric])
 
+drivers_list = get_latest_season_drivers()
+data = get_historic_synergies() 
+driver = st.sidebar.selectbox('Pick a driver', options=drivers_list)
+show_model_stats = st.sidebar.button('Show model stats')
+
+
+teammate_delta = st.sidebar.number_input('Teammate Delta', min_value=0, max_value=5, step=0.1)
+lap_stdev = st.sidebar.number_input('Lap stdev', min_value=0, max_value=5, step=0.1)
+avg_q = st.sidebar.number_input('Avg Quali', min_value=0, max_value=5, step=0.1)
+avg_r = st.sidebar.number_input('Avg Race', min_value=0, max_value=5, step=0.1)
+dnf_rate = st.sidebar.number_input('DNF Rate', min_value=0, max_value=5, step=0.1)
+
+  
 if show_model_stats:
     st.dataframe(data)
+    st.divider()
+    st.markdown('Feature weights for the current model')
     show_weights()
+    st.divider()
     plot_col1, plot_col2 = st.columns([1,2])
     with plot_col1:
         st.markdown('Distribution of synergy levels over the dataset')
@@ -74,6 +84,6 @@ if show_model_stats:
     with plot_col2:
         st.markdown('Top ten synergy levels from the dataset')
         plot_top_synergies(data, top=10)
-    
+    st.divider()
     st.markdown('Driver Synergy levels compared to the best and average over the seasons')
     plot_driver_synergies(driver, data)
