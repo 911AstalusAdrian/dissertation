@@ -5,7 +5,7 @@ from datetime import datetime
 
 from src.data_ingestion.openf1_loader import get_drivers_for_season
 from src.data_ingestion.fastf1_loader import get_synergy_metrics
-from src.model.model import get_weights, set_weights_and_update_synergy
+from src.model.model import get_weights, set_weights, recalculate_synergy
 from src.utils.plot_utils import DRIVER_SYNERGY_COLOR, BEST_SYNERGY_COLOR, AVG_SYNERGY_COLOR
 
 def get_historic_synergies():
@@ -60,7 +60,8 @@ def show_weights():
 
 def update_model_weights(text):
     weight_list = [float(i) for i in text.split(',')]
-    set_weights_and_update_synergy(weight_list)
+    set_weights(weight_list[0],weight_list[1],weight_list[2],weight_list[3],weight_list[4])
+    recalculate_synergy()
     st.toast('Synergy Scores updated!')
 
 drivers_list = get_latest_season_drivers()

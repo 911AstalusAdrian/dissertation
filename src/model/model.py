@@ -144,7 +144,6 @@ def recalculate_synergy():
     normalised_df['SynergyScore'] = scaler.fit_transform(normalised_df[['SynergyScore']]) 
     normalised_df.to_csv(f'data\\historic_synergies\\normalised_synergies.csv', index=False)
 
-
 def set_weights_and_update_synergy(weights_list):
     set_weights(weights_list[0], weights_list[1], weights_list[2], weights_list[3], weights_list[4])
     recalculate_synergy()
