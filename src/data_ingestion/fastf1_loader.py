@@ -180,8 +180,6 @@ def get_distinct_drivers(first_season = 2018, last_season = 2025):
     return sorted(all_drivers)
 
 def get_events_for_season(season:int = 2025):
-    # schedule = SCHEDULE_CACHE.get(season)
-    # if schedule is None:
     schedule = fastf1.get_event_schedule(season)
     # cleaning the schedule (remove testing and keep only completed events for current year)
     for index, event in schedule.iterrows():
@@ -242,7 +240,6 @@ def calculate_quali_teammate_delta(driver_res, teammate_res):
         delta = timedelta(seconds=0)
     else:
         delta = driver_best_time - teammate_best_time
-    # print(f'{delta_seconds:.3f}')
     delta_seconds = delta.total_seconds()
 
     if abs(delta_seconds ) > 5: return 0.0

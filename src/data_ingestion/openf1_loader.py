@@ -12,7 +12,6 @@ def fetch_openf1_data(endpoint: str, params: dict = {}) -> pd.DataFrame:
     offset = 0
 
     while True:
-        # params.update({"limit": limit, "offset": offset})
         response = requests.get(BASE_URL + endpoint, params=params)
         response.raise_for_status()
         data = response.json()
@@ -92,6 +91,7 @@ def get_distinct_drivers_list(country_code=None, driver_number=None, meeting_key
             'team_name': team_name}
     all_drivers =  fetch_static_data('drivers', params)
     unique_drivers = all_drivers.drop_duplicates(subset='full_name')
+    return unique_drivers
 
 def get_fulltime_drivers():
     unique_drivers = get_distinct_drivers()
@@ -201,6 +201,3 @@ def get_teams_for_driver(driver_name=None):
     unique_teams = driver_rows.drop_duplicates(subset='team_name')
 
     return unique_teams['team_name'].to_list()
-
-
-# print(get_drivers_for_season(2025))

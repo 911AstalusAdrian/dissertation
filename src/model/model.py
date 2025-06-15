@@ -52,8 +52,6 @@ def compute_historic_synergies():
             except Exception as e:
                 print(f'Skipping driver {driver} from {season}: {str(e)}')
 
-    # driver_synergy_data_df = pd.DataFrame(driver_season_data)
-    # driver_synergy_data_df.to_csv('historic_data.csv')
 
 def compute_synergies_for_season():
     driver_season_data = []
