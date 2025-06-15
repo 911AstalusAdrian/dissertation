@@ -131,7 +131,7 @@ def train_model(dataframe):
 
 def recalculate_synergy():
     for year in range(2020, 2025):
-        df = pd.read_csv(f'data\\historic_synergies\\historic_data_{year}.csv')
+        df = pd.read_csv(f'data/historic_synergies/historic_data_{year}.csv')
         for index, driver in df.iterrows():
             metrics = driver[['Teammate_delta', 'Lap_stdev', 'Avg_Q', 'Avg_R', 'DNFRate']]
             new_syn = compute_synergy_score(metrics)
