@@ -2,9 +2,9 @@ import streamlit as st
 import pandas as pd
 import numpy as np
 
-from src.data_ingestion.openf1_loader import get_recent_drivers
-from src.data_ingestion.fastf1_loader import get_synergy_metrics
-from src.utils.plot_utils import RACE_COLOR, QUALI_COLOR
+# from src.data_ingestion.openf1_loader import get_recent_drivers
+# from src.data_ingestion.fastf1_loader import get_synergy_metrics
+# from src.utils.plot_utils import RACE_COLOR, QUALI_COLOR
 
 @st.cache_data
 def get_historic_synergies():
@@ -23,16 +23,16 @@ def plot_synergy_level_distribution(synergy_df):
 
 def plot_top_synergies(synergy_df, top=10):
     top_synergies = synergy_df.nlargest(top, 'SynergyScore')
-    top_synergies = top_synergies.sort_values('SynergyScore')
-    top_synergies['Label'] = f'{top_synergies['Driver']} ({top_synergies['Season']})'
-
-    # top_synergies.drop(columns=['Driver', 'Season'])
-    # top_synergies.set_index('SynergyScore')
-    # st.bar_chart(top_synergies, horizontal=True)
-    st.dataframe(top_synergies)
-
+    top_synergies = top_synergies.sort_values('SynergyScore', ascending=False)
+    top_synergies['DriverSeason'] = top_synergies['Driver'] + ' (' + top_synergies['Season'].astype(str) + ')'
+    top_synergies.set_index('DriverSeason')
+    st.bar_chart(top_synergies[['DriverSeason']], horizontal=True)
 
 data = get_historic_synergies()
 st.dataframe(data)
 plot_synergy_level_distribution(data)
 plot_top_synergies(data, top=10)
+
+
+# data = get_historic_synergies()
+# plot_top_synergies(data, top=10)
