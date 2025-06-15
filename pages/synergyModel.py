@@ -5,10 +5,9 @@ from datetime import datetime
 
 from src.data_ingestion.openf1_loader import get_drivers_for_season
 from src.data_ingestion.fastf1_loader import get_synergy_metrics
-from src.model.model import get_weights, set_weights
+from src.model.model import get_weights, set_weights_and_update_synergy
 from src.utils.plot_utils import DRIVER_SYNERGY_COLOR, BEST_SYNERGY_COLOR, AVG_SYNERGY_COLOR
 
-@st.cache_data
 def get_historic_synergies():
     data = pd.read_csv(r"data/historic_synergies/normalised_synergies.csv")
     bins = [0, 30, 50, 70, 85, 100]
@@ -59,9 +58,10 @@ def show_weights():
     for index, metric in enumerate(weight_metrics):
         cols[index].metric(metric, weights[metric])
 
-def update_weights(text):
-    int_list = [int(i) for i in text.split(',')]
-    set_weights(int_list[0],int_list[1],int_list[2],int_list[3],int_list[4])
+def update_model_weights(text):
+    weight_list = [float(i) for i in text.split(',')]
+    set_weights_and_update_synergy(weight_list)
+    st.toast('Synergy Scores updated!')
 
 drivers_list = get_latest_season_drivers()
 data = get_historic_synergies() 
@@ -69,7 +69,7 @@ driver = st.sidebar.selectbox('Pick a driver', options=drivers_list)
 show_model_stats = st.sidebar.button('Show model stats')
 
 text = st.sidebar.text_input('weights')
-button = st.sidebar.button('Update weights', on_click=update_weights, args=(text,))
+button = st.sidebar.button('Update model weights', on_click=update_model_weights, args=(text,))
   
 if show_model_stats:
     st.dataframe(data)

@@ -9,6 +9,7 @@ sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '..', '.
 from sklearn.model_selection import train_test_split
 from sklearn.ensemble import RandomForestRegressor
 from sklearn.metrics import root_mean_squared_error
+from sklearn.preprocessing import MinMaxScaler
 
 from src.data_ingestion.fastf1_loader import get_synergy_metrics, get_synergy_metrics_for_drivers
 from src.data_ingestion.openf1_loader import get_drivers_for_season
@@ -23,11 +24,11 @@ weights = {
 
 def compute_synergy_score(metrics: dict) -> float:
     score = (
-        -metrics['Teammate_delta'] * 2 +  # negative delta = faster than teammate
-        -metrics['Lap_stdev'] * 1.5 +     # lower std dev = more consistent
-        -metrics['Avg_Q'] * 0.5 +         # higher qual = better driver performance
-        -metrics['Avg_R'] * 1.0 +         # higher race position = better result
-        -metrics['DNFRate'] * 3           # fewer DNFs = more reliable
+        -metrics['Teammate_delta'] * weights['Teammate_delta'] +  # negative delta = faster than teammate
+        -metrics['Lap_stdev'] * weights['Lap_stdev'] +     # lower std dev = more consistent
+        -metrics['Avg_Q'] * weights['Avg_Q'] +         # higher qual = better driver performance
+        -metrics['Avg_R'] * weights['Avg_R'] +         # higher race position = better result
+        -metrics['DNFRate'] * weights['DNFRate']           # fewer DNFs = more reliable
     )
     return score
 
@@ -128,7 +129,28 @@ def train_model(dataframe):
     print(y_test)
     print(predictions)
 
+def recalculate_synergy():
+    for year in range(2020, 2025):
+        df = pd.read_csv(f'data\\historic_synergies\\historic_data_{year}.csv')
+        for index, driver in df.iterrows():
+            metrics = driver[['Teammate_delta', 'Lap_stdev', 'Avg_Q', 'Avg_R', 'DNFRate']]
+            new_syn = compute_synergy_score(metrics)
+            df.loc[index, 'SynergyScore'] = new_syn
+        df.to_csv(f'data\\historic_synergies\\historic_data_{year}.csv', index=False) # update the CSV file
 
+    normalised_df = pd.DataFrame()
+    normalised_df = data_cleaning(normalised_df)[['Driver', 'Season', 'SynergyScore']]
+    scaler = MinMaxScaler(feature_range=(0, 100))
+    normalised_df['SynergyScore'] = scaler.fit_transform(normalised_df[['SynergyScore']]) 
+    normalised_df.to_csv(f'data\\historic_synergies\\normalised_synergies.csv', index=False)
+
+
+def set_weights_and_update_synergy(weights_list):
+    set_weights(weights_list[0], weights_list[1], weights_list[2], weights_list[3], weights_list[4])
+    recalculate_synergy()
+
+# set_weights_and_update_synergy([1.0, 2.0, 0.5, 1.5, 0.5])
+# recalculate_synergy()
 # # ,Driver,Season,Teammate_delta,Lap_stdev,Avg_Q,Avg_R,DNFRate,SynergyScore
 # df = pd.DataFrame()
 # clean_df = data_cleaning(df)
