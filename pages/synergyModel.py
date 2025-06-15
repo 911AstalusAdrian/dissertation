@@ -5,6 +5,7 @@ from datetime import datetime
 
 from src.data_ingestion.openf1_loader import get_drivers_for_season
 from src.data_ingestion.fastf1_loader import get_synergy_metrics
+from src.model.model import get_weights, set_weights
 from src.utils.plot_utils import DRIVER_SYNERGY_COLOR, BEST_SYNERGY_COLOR, AVG_SYNERGY_COLOR
 
 @st.cache_data
@@ -57,10 +58,15 @@ driver = st.sidebar.selectbox('Pick a driver', options=drivers_list)
 show_driver_button = st.sidebar.button('Show Driver Synergy')
 show_model_stats = st.sidebar.button('SHow model stats')
 
-
-
+def show_weights():
+    weights = get_weights()
+    weight_metrics = list(weights.keys())
+    cols = st.columns(len(weight_metrics))
+    for index, metric in enumerate(weight_metrics):
+        cols[index].metric(metric, weights[metric])
 
 if show_model_stats:
+    show_weights()
     st.dataframe(data)
     plot_col1, plot_col2 = st.columns([1,2])
     with plot_col1:
@@ -71,4 +77,5 @@ if show_model_stats:
         plot_top_synergies(data, top=10)
 
 if show_driver_button:
+    st.markdown('Driver Synergy levels compared to the best and average over the seasons')
     plot_driver_synergies(driver, data)

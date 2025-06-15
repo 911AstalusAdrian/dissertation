@@ -11,9 +11,16 @@ from sklearn.model_selection import train_test_split
 from sklearn.ensemble import RandomForestRegressor
 from sklearn.metrics import root_mean_squared_error
 
-from src.utils.cache import DRIVERS_2018, DRIVERS_2019, DRIVERS_2020, DRIVERS_2021, DRIVERS_2022
 from src.data_ingestion.fastf1_loader import get_synergy_metrics, get_synergy_metrics_for_drivers
 from src.data_ingestion.openf1_loader import get_drivers_for_season
+
+weights = {
+    'Teammate_delta': 2.0,
+    'Lap_stdev': 1.5,
+    'Avg_Q': 0.5,
+    'Avg_R': 1.0,
+    'DNFRate': 3.0
+}
 
 def compute_synergy_score(metrics: dict) -> float:
     score = (
@@ -53,8 +60,8 @@ def compute_historic_synergies():
 
 def compute_synergies_for_season():
     driver_season_data = []
-    drivers = DRIVERS_2022
-    season = 2022
+    drivers = None  # Manually load drivers list
+    season = None   # Manually input season to mach drivers list
     try:
         synergy_metrics = get_synergy_metrics_for_drivers(drivers, season)
         for driver in drivers:
@@ -102,8 +109,17 @@ def train_model(dataframe):
     print(y_test)
     print(predictions)
 
+def get_weights():
+    return weights
 
-# ,Driver,Season,Teammate_delta,Lap_stdev,Avg_Q,Avg_R,DNFRate,SynergyScore
-df = pd.DataFrame()
-clean_df = data_cleaning(df)
-train_model(clean_df)
+def set_weights(teammate_delta, lap_stdev, avg_q, avg_r, dnf_rate):
+    weights['Teammate_delta'] = teammate_delta
+    weights['Lap_stdev'] = lap_stdev
+    weights['Avg_Q'] = avg_q
+    weights['Avg_R'] = avg_r
+    weights['DNFRate'] = dnf_rate
+
+# # ,Driver,Season,Teammate_delta,Lap_stdev,Avg_Q,Avg_R,DNFRate,SynergyScore
+# df = pd.DataFrame()
+# clean_df = data_cleaning(df)
+# train_model(clean_df)
