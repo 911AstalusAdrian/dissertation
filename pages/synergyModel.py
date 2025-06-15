@@ -55,8 +55,7 @@ def plot_driver_synergies(driver, data):
 drivers_list = get_latest_season_drivers()
 data = get_historic_synergies() 
 driver = st.sidebar.selectbox('Pick a driver', options=drivers_list)
-show_driver_button = st.sidebar.button('Show Driver Synergy')
-show_model_stats = st.sidebar.button('SHow model stats')
+show_model_stats = st.sidebar.button('Show model stats')
 
 def show_weights():
     weights = get_weights()
@@ -66,8 +65,8 @@ def show_weights():
         cols[index].metric(metric, weights[metric])
 
 if show_model_stats:
-    show_weights()
     st.dataframe(data)
+    show_weights()
     plot_col1, plot_col2 = st.columns([1,2])
     with plot_col1:
         st.markdown('Distribution of synergy levels over the dataset')
@@ -75,7 +74,6 @@ if show_model_stats:
     with plot_col2:
         st.markdown('Top ten synergy levels from the dataset')
         plot_top_synergies(data, top=10)
-
-if show_driver_button:
+    
     st.markdown('Driver Synergy levels compared to the best and average over the seasons')
     plot_driver_synergies(driver, data)
