@@ -64,11 +64,11 @@ driver = st.sidebar.selectbox('Pick a driver', options=drivers_list)
 show_model_stats = st.sidebar.button('Show model stats')
 
 
-teammate_delta = st.sidebar.number_input('Teammate Delta', value = 1.0, min_value=0.0, max_value=5.0, step=0.1)
-lap_stdev = st.sidebar.number_input('Lap stdev', value = 1.0, min_value=0.0, max_value=5.0, step=0.1)
-avg_q = st.sidebar.number_input('Avg Quali', value = 1.0, min_value=0.0, max_value=5.0, step=0.1)
-avg_r = st.sidebar.number_input('Avg Race', value = 1.0, min_value=0.0, max_value=5.0, step=0.1)
-dnf_rate = st.sidebar.number_input('DNF Rate', value = 1.0, min_value=0.0, max_value=5.0, step=0.1)
+teammate_delta = st.number_input('Teammate Delta', value = 1.0, min_value=0.0, max_value=5.0, step=0.1)
+lap_stdev = st.number_input('Lap stdev', value = 1.0, min_value=0.0, max_value=5.0, step=0.1)
+avg_q = st.number_input('Avg Quali', value = 1.0, min_value=0.0, max_value=5.0, step=0.1)
+avg_r = st.number_input('Avg Race', value = 1.0, min_value=0.0, max_value=5.0, step=0.1)
+dnf_rate = st.number_input('DNF Rate', value = 1.0, min_value=0.0, max_value=5.0, step=0.1)
 
   
 if show_model_stats:
@@ -76,6 +76,14 @@ if show_model_stats:
     st.divider()
     st.markdown('Feature weights for the current model')
     show_weights()
+    
+    teammate_delta, lap_stdev, avg_q, avg_r, dnf_rate = st.columns(5)
+    teammate_delta = st.number_input('Teammate Delta', value = 1.0, min_value=0.0, max_value=5.0, step=0.1)
+    lap_stdev = st.number_input('Lap stdev', value = 1.0, min_value=0.0, max_value=5.0, step=0.1)
+    avg_q = st.number_input('Avg Quali', value = 1.0, min_value=0.0, max_value=5.0, step=0.1)
+    avg_r = st.number_input('Avg Race', value = 1.0, min_value=0.0, max_value=5.0, step=0.1)
+    dnf_rate = st.number_input('DNF Rate', value = 1.0, min_value=0.0, max_value=5.0, step=0.1)
+
     st.divider()
     plot_col1, plot_col2 = st.columns([1,2])
     with plot_col1:
