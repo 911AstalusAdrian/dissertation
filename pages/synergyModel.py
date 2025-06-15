@@ -16,6 +16,12 @@ def get_historic_synergies():
     data['SynergyLevel'] = pd.cut(data['SynergyScore'], bins=bins, labels=labels, right=True)
     return data
 
+@st.cache_data
+def get_latest_season_drivers():
+    latest_season = datetime.today().year
+    drivers_list = get_drivers_for_season(latest_season)
+    return drivers_list
+
 def plot_synergy_level_distribution(synergy_df):
     synergy_counts = synergy_df['SynergyLevel'].value_counts().sort_index()
     df = synergy_counts.reset_index()
@@ -36,11 +42,6 @@ def plot_top_synergies(synergy_df, top=10):
     top_synergies = top_synergies.set_index('DriverSeason')
     st.bar_chart(top_synergies[['SynergyScore']], horizontal=True)
 
-def get_latest_season_drivers():
-    latest_season = datetime.today().year
-    drivers_list = get_drivers_for_season(latest_season)
-    return drivers_list
-
 def plot_driver_synergies(driver, data):
     avg_synergy = data.groupby('Season')['SynergyScore'].mean().rename('Average')
     max_synergy = data.groupby('Season')['SynergyScore'].max().rename('Best')
@@ -58,10 +59,17 @@ def show_weights():
     for index, metric in enumerate(weight_metrics):
         cols[index].metric(metric, weights[metric])
 
+def update_weights(text):
+    int_list = [int(i) for i in text.split(',')]
+    set_weights(int_list[0],int_list[1],int_list[2],int_list[3],int_list[4])
+
 drivers_list = get_latest_season_drivers()
 data = get_historic_synergies() 
 driver = st.sidebar.selectbox('Pick a driver', options=drivers_list)
 show_model_stats = st.sidebar.button('Show model stats')
+
+text = st.sidebar.text_input('weights')
+button = st.sidebar.button('Update weights', on_click=update_weights(text))
   
 if show_model_stats:
     st.dataframe(data)

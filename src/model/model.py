@@ -1,4 +1,3 @@
-import fastf1
 import pandas as pd
 import numpy as np
 import sys
@@ -95,6 +94,26 @@ def data_cleaning(dataframe):
 
     return dataframe
 
+def get_weights():
+    return weights
+
+def set_weights(teammate_delta, lap_stdev, avg_q, avg_r, dnf_rate):
+    weights['Teammate_delta'] = teammate_delta
+    weights['Lap_stdev'] = lap_stdev
+    weights['Avg_Q'] = avg_q
+    weights['Avg_R'] = avg_r
+    weights['DNFRate'] = dnf_rate
+
+def model_features_importance(model, X):
+    importances = model.feature_importances_
+    features = X.columns
+
+    indices = np.argsort(importances)[::-1]
+    sorted_features = [features[i] for i in indices]
+    sorted_importances = importances[indices]
+
+    return sorted_features, sorted_importances
+
 def train_model(dataframe):
     X = dataframe[['Teammate_delta', 'Lap_stdev', 'Avg_Q', 'Avg_R', 'DNFRate']]
     y = dataframe['SynergyScore']
@@ -109,15 +128,6 @@ def train_model(dataframe):
     print(y_test)
     print(predictions)
 
-def get_weights():
-    return weights
-
-def set_weights(teammate_delta, lap_stdev, avg_q, avg_r, dnf_rate):
-    weights['Teammate_delta'] = teammate_delta
-    weights['Lap_stdev'] = lap_stdev
-    weights['Avg_Q'] = avg_q
-    weights['Avg_R'] = avg_r
-    weights['DNFRate'] = dnf_rate
 
 # # ,Driver,Season,Teammate_delta,Lap_stdev,Avg_Q,Avg_R,DNFRate,SynergyScore
 # df = pd.DataFrame()
