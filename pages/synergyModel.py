@@ -25,7 +25,7 @@ def plot_top_synergies(synergy_df, top=10):
     top_synergies = synergy_df.nlargest(top, 'SynergyScore')
     top_synergies = top_synergies.sort_values('SynergyScore', ascending=False)
     top_synergies['DriverSeason'] = top_synergies['Driver'] + ' (' + top_synergies['Season'].astype(str) + ')'
-    top_synergies.set_index('DriverSeason')
+    top_synergies = top_synergies.set_index('DriverSeason')
     st.bar_chart(top_synergies[['SynergyScore']], horizontal=True)
 
 data = get_historic_synergies()
