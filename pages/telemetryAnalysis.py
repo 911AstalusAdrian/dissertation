@@ -1,6 +1,6 @@
 import streamlit as st
 
-from src.data_ingestion.openf1_loader import get_races_per_season, get_teams_for_season
+from src.data_ingestion.openf1_loader import *
 
 if "season" not in st.session_state:
     st.session_state.season = 2023
