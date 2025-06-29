@@ -1,90 +1,62 @@
-import fastf1
-from fastf1 import plotting
-import pandas as pd
-import numpy as np
 import streamlit as st
-import plotly.express as px
+import fastf1
+import pandas as pd
+import matplotlib.pyplot as plt
 
-plotting.setup_mpl()
+# Streamlit section
+st.title("Telemetry Comparison Between Teammates")
 
-@st.cache_data
-def get_event_schedule(season):
-    return fastf1.get_event_schedule(season)
+# User inputs
+season = st.selectbox("Season", options=list(range(2018, 2024)))
+race = st.text_input("Grand Prix Name (e.g., 'Monza')")
+session_type = st.selectbox("Session", options=["Q", "R", "FP1", "FP2", "FP3"])
+team = st.text_input("Team name (exactly as in data, e.g., 'Mercedes')")
+load_button = st.button("Load Session")
 
-@st.cache_data
+# Helper function to load session with correct flags
+@st.cache_data(show_spinner="Loading session data...")
 def load_session(year, gp_name, session_type):
     event = fastf1.get_event(year, gp_name)
     session = event.get_session(session_type)
-    session.load()
+    session.load(laps=True, telemetry=True, weather=False, messages=False, livedata=False)
     return session
 
-def interpolate_telemetry(tel, common_distance):
-    tel_interp = tel.set_index('Distance').reindex(common_distance).interpolate(method='index').reset_index()
-    tel_interp.rename(columns={'index': 'Distance'}, inplace=True)
-    return tel_interp
+if load_button and race and team:
+    try:
+        session = load_session(season, race, session_type)
 
-# --- Streamlit UI ---
-st.title("Teammate Telemetry Comparison")
+        # Check if laps are loaded
+        if session.laps.empty:
+            st.error("No lap data available for this session.")
+        else:
+            # Find drivers from the specified team
+            laps = session.laps
+            team_drivers = laps[laps['Team'] == team]['Driver'].unique()
 
-season = st.selectbox("Select Season", list(range(2018, 2025)))
-event_schedule = get_event_schedule(season)
-races = event_schedule['EventName'].tolist()
-race = st.selectbox("Select Race", races)
+            if len(team_drivers) < 2:
+                st.error(f"Not enough drivers found for team {team} in this session.")
+            else:
+                driver1, driver2 = team_drivers[0], team_drivers[1]
 
-session_type = st.selectbox("Session Type", ['Qualifying', 'Race'])
+                # Get fastest lap for each driver
+                lap1 = laps.pick_driver(driver1).pick_fastest()
+                lap2 = laps.pick_driver(driver2).pick_fastest()
 
-if st.button("Load Session and Show Teammates"):
-    session = load_session(season, race, session_type)
-    drivers = session.results['FullName'].unique().tolist()
-    team_options = session.results['TeamName'].unique().tolist()
+                if lap1 is None or lap2 is None:
+                    st.error("One or both drivers do not have valid lap data.")
+                else:
+                    tel1 = lap1.get_car_data().add_distance()
+                    tel2 = lap2.get_car_data().add_distance()
 
-    team = st.selectbox("Select Team", team_options)
+                    # Plot speed telemetry
+                    fig, ax = plt.subplots(figsize=(10, 5))
+                    ax.plot(tel1['Distance'], tel1['Speed'], label=f"{driver1} Fastest Lap")
+                    ax.plot(tel2['Distance'], tel2['Speed'], label=f"{driver2} Fastest Lap")
+                    ax.set_xlabel("Distance (m)")
+                    ax.set_ylabel("Speed (km/h)")
+                    ax.legend()
+                    ax.set_title(f"Speed Comparison: {driver1} vs {driver2}")
+                    st.pyplot(fig)
 
-    team_drivers = session.results.loc[session.results['TeamName'] == team, 'FullName'].tolist()
-
-    if len(team_drivers) < 2:
-        st.warning("This team has less than two drivers in this session.")
-    else:
-        driver1 = team_drivers[0]
-        driver2 = team_drivers[1]
-
-        # Get laps
-        laps_driver1 = session.laps.pick_driver(driver1).pick_fastest()
-        laps_driver2 = session.laps.pick_driver(driver2).pick_fastest()
-
-        tel1 = laps_driver1.get_telemetry().add_distance()
-        tel2 = laps_driver2.get_telemetry().add_distance()
-
-        # Common distance range
-        min_distance = max(tel1['Distance'].min(), tel2['Distance'].min())
-        max_distance = min(tel1['Distance'].max(), tel2['Distance'].max())
-        common_distance = np.linspace(min_distance, max_distance, num=500)
-
-        # Interpolate
-        tel1_interp = interpolate_telemetry(tel1, common_distance)
-        tel2_interp = interpolate_telemetry(tel2, common_distance)
-
-        # Plot Speed
-        fig_speed = px.line(x=tel1_interp['Distance'], y=tel1_interp['Speed'],
-                            labels={'x': 'Distance (m)', 'y': 'Speed (km/h)'},
-                            title=f"Speed Comparison: {driver1} vs {driver2}")
-        fig_speed.add_scatter(x=tel2_interp['Distance'], y=tel2_interp['Speed'], name=driver2)
-        st.plotly_chart(fig_speed)
-
-        # Plot Throttle
-        fig_throttle = px.line(x=tel1_interp['Distance'], y=tel1_interp['Throttle'],
-                               labels={'x': 'Distance (m)', 'y': 'Throttle (%)'},
-                               title="Throttle Comparison")
-        fig_throttle.add_scatter(x=tel2_interp['Distance'], y=tel2_interp['Throttle'], name=driver2)
-        st.plotly_chart(fig_throttle)
-
-        # Plot Brake
-        fig_brake = px.line(x=tel1_interp['Distance'], y=tel1_interp['Brake'],
-                            labels={'x': 'Distance (m)', 'y': 'Brake (%)'},
-                            title="Brake Comparison")
-        fig_brake.add_scatter(x=tel2_interp['Distance'], y=tel2_interp['Brake'], name=driver2)
-        st.plotly_chart(fig_brake)
-
-        # Optional: plot Gear, RPM, Delta, etc.
-
-        st.success("Telemetry comparison plots generated successfully! 🚀")
+    except Exception as e:
+        st.error(f"Error loading or processing data: {e}")
