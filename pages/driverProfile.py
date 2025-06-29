@@ -199,9 +199,9 @@ if show_driver_button:
 
     if "driver_data" in st.session_state and st.session_state.get("driver_selected") == driver:
         st.header(f"Stats for {driver}")
-        st.write("Driver Info Dictionary:", st.session_state["driver_data"])
-        st.dataframe(st.session_state["driver_data"]["Results"])
-        st.dataframe(st.session_state["driver_data"]["Comparisons"])
+        # st.write("Driver Info Dictionary:", st.session_state["driver_data"])
+        # st.dataframe(st.session_state["driver_data"]["Results"])
+        # st.dataframe(st.session_state["driver_data"]["Comparisons"])
 
     profile_col1, profile_col2 = st.columns([1,3])
     with profile_col1:
