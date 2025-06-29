@@ -680,4 +680,4 @@ def get_driver_synergy_per_race(drivername:str=None, starting_season:int=2020, f
 
 
 
-print(get_driver_full_info('Charles Leclerc'))
+# print(get_driver_full_info('Charles Leclerc'))
