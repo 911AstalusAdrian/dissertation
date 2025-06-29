@@ -1,7 +1,6 @@
 import streamlit as st
 import fastf1
-import plotly.graph_objects as go
-import pandas as pd 
+import matplotlib.pyplot as plt
 
 from src.data_ingestion.openf1_loader import *
 
