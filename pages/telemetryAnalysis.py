@@ -143,7 +143,7 @@ if load_data:
                 ))
 
                 fig.update_layout(
-                    title=f"Qualifying Telemetry Comparison - {team} ({season}, Round {round_number})",
+                    title=f"Qualifying Telemetry Comparison - {team} ({season}, Round {selected_round})",
                     xaxis_title='Distance (m)',
                     yaxis_title='Metric Value',
                     hovermode="x unified",
