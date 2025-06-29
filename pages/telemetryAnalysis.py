@@ -1,7 +1,13 @@
 import streamlit as st
 import fastf1
-import matplotlib.pyplot as plt
+import numpy as np
+import plotly.express as px
 from src.data_ingestion.openf1_loader import *
+
+def interpolate_telemetry(tel, common_distance):
+    tel_interp = tel.set_index('Distance').reindex(common_distance).interpolate(method='index').reset_index()
+    tel_interp.rename(columns={'index': 'Distance'}, inplace=True)
+    return tel_interp
 
 if "season" not in st.session_state:
     st.session_state.season = 2023
@@ -47,49 +53,52 @@ if load_data:
         drivers = team_drivers_df['Abbreviation'].values
 
 
-        if len(drivers) != 2:
-            st.error(f"Expected 2 drivers for {team}, but found {len(drivers)}. Check if both participated in quali.")
+        if len(drivers) < 2:
+            st.warning("This team has less than two drivers in this session.")
         else:
-            driver1, driver2 = drivers
+            driver1 = drivers[0]
+            driver2 = drivers[1]
 
-            laps_driver1 = quali_session.laps.pick_driver(driver1).pick_quicklaps()
-            laps_driver2 = quali_session.laps.pick_driver(driver2).pick_quicklaps()
+            # Get laps
+            laps_driver1 = quali_session.laps.pick_driver(driver1).pick_fastest()
+            laps_driver2 = quali_session.laps.pick_driver(driver2).pick_fastest()
 
-            if laps_driver1.empty or laps_driver2.empty:
-                st.error("One or both drivers have no valid quicklaps.")
-            else:
-                fastest_lap_driver1 = laps_driver1.pick_fastest()
-                fastest_lap_driver2 = laps_driver2.pick_fastest()
+            tel1 = laps_driver1.get_telemetry().add_distance()
+            tel2 = laps_driver2.get_telemetry().add_distance()
 
-                tel_driver1 = fastest_lap_driver1.get_car_data().add_distance()
-                tel_driver2 = fastest_lap_driver2.get_car_data().add_distance()
+            # Common distance range
+            min_distance = max(tel1['Distance'].min(), tel2['Distance'].min())
+            max_distance = min(tel1['Distance'].max(), tel2['Distance'].max())
+            common_distance = np.linspace(min_distance, max_distance, num=500)
 
-                # Create Pandas DataFrames for each driver
-                df1 = pd.DataFrame({
-                    "Distance": tel_driver1["Distance"],
-                    f"Speed ({driver1})": tel_driver1["Speed"]
-                })
-                df2 = pd.DataFrame({
-                    "Distance": tel_driver2["Distance"],
-                    f"Speed ({driver2})": tel_driver2["Speed"]
-                })
+            # Interpolate
+            tel1_interp = interpolate_telemetry(tel1, common_distance)
+            tel2_interp = interpolate_telemetry(tel2, common_distance)
 
-                # Merge on Distance (we do an outer join and interpolate to align them)
-                merged = pd.merge_asof(
-                    df1.sort_values("Distance"),
-                    df2.sort_values("Distance"),
-                    on="Distance",
-                    direction="nearest",
-                    tolerance=1  # small tolerance to avoid misalignments
-                )
+            # Plot Speed
+            fig_speed = px.line(x=tel1_interp['Distance'], y=tel1_interp['Speed'],
+                                labels={'x': 'Distance (m)', 'y': 'Speed (km/h)'},
+                                title=f"Speed Comparison: {driver1} vs {driver2}")
+            fig_speed.add_scatter(x=tel2_interp['Distance'], y=tel2_interp['Speed'], name=driver2)
+            st.plotly_chart(fig_speed)
 
-                merged = merged.dropna()
+            # Plot Throttle
+            fig_throttle = px.line(x=tel1_interp['Distance'], y=tel1_interp['Throttle'],
+                                labels={'x': 'Distance (m)', 'y': 'Throttle (%)'},
+                                title="Throttle Comparison")
+            fig_throttle.add_scatter(x=tel2_interp['Distance'], y=tel2_interp['Throttle'], name=driver2)
+            st.plotly_chart(fig_throttle)
 
-                # Set Distance as index for st.line_chart
-                merged = merged.set_index("Distance")
+            # Plot Brake
+            fig_brake = px.line(x=tel1_interp['Distance'], y=tel1_interp['Brake'],
+                                labels={'x': 'Distance (m)', 'y': 'Brake (%)'},
+                                title="Brake Comparison")
+            fig_brake.add_scatter(x=tel2_interp['Distance'], y=tel2_interp['Brake'], name=driver2)
+            st.plotly_chart(fig_brake)
 
-                # Show using Streamlit line_chart
-                st.line_chart(merged)
+            # Optional: plot Gear, RPM, Delta, etc.
+
+            st.success("Telemetry comparison plots generated successfully! 🚀")
 
     except Exception as e:
         st.error(f"Failed to load session: {e}")
