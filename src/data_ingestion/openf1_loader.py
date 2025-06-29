@@ -208,4 +208,4 @@ def get_teams_for_season(season:int=2023):
     sessions = fetch_static_data('sessions', params)
     first_session_key = sessions.loc[0].session_key
     drivers = get_distinct_drivers(session_key=first_session_key)
-    return set(drivers['team_name'])
+    return list(set(drivers['team_name']))
