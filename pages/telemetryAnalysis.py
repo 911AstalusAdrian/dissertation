@@ -82,5 +82,15 @@ if load_data:
 
                 st.pyplot(fig)
 
+
+            fig, ax = plt.subplots(figsize=(10, 6))
+            ax.plot(tel_driver1['Distance'], tel_driver1['Throttle'], label=driver1)
+            ax.plot(tel_driver2['Distance'], tel_driver2['Throttle'], label=driver2)
+            ax.set_xlabel("Distance (m)")
+            ax.set_ylabel("Throttle (%)")
+            ax.legend()
+            ax.grid(True)
+            st.pyplot(fig)
+
     except Exception as e:
         st.error(f"Failed to load session: {e}")
