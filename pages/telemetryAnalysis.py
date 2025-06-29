@@ -46,17 +46,17 @@ if load_data:
         team_drivers_df = quali_session.results[quali_session.results['TeamName'] == team]
         drivers = team_drivers_df['Abbreviation'].values
 
+
         if len(drivers) != 2:
             st.error(f"Expected 2 drivers for {team}, but found {len(drivers)}. Check if both participated in quali.")
         else:
             driver1, driver2 = drivers
 
-            # Pick laps
             laps_driver1 = quali_session.laps.pick_driver(driver1).pick_quicklaps()
             laps_driver2 = quali_session.laps.pick_driver(driver2).pick_quicklaps()
 
             if laps_driver1.empty or laps_driver2.empty:
-                st.error(f"One or both drivers have no valid quicklaps in quali.")
+                st.error("One or both drivers have no valid quicklaps.")
             else:
                 fastest_lap_driver1 = laps_driver1.pick_fastest()
                 fastest_lap_driver2 = laps_driver2.pick_fastest()
@@ -64,17 +64,32 @@ if load_data:
                 tel_driver1 = fastest_lap_driver1.get_car_data().add_distance()
                 tel_driver2 = fastest_lap_driver2.get_car_data().add_distance()
 
-                # --- Plot example: Speed vs Distance ---
-                fig, ax = plt.subplots(figsize=(10, 6))
-                ax.plot(tel_driver1['Distance'], tel_driver1['Speed'], label=driver1)
-                ax.plot(tel_driver2['Distance'], tel_driver2['Speed'], label=driver2)
+                # Create Pandas DataFrames for each driver
+                df1 = pd.DataFrame({
+                    "Distance": tel_driver1["Distance"],
+                    f"Speed ({driver1})": tel_driver1["Speed"]
+                })
+                df2 = pd.DataFrame({
+                    "Distance": tel_driver2["Distance"],
+                    f"Speed ({driver2})": tel_driver2["Speed"]
+                })
 
-                ax.set_xlabel("Distance (m)")
-                ax.set_ylabel("Speed (km/h)")
-                ax.legend()
-                ax.grid(True)
+                # Merge on Distance (we do an outer join and interpolate to align them)
+                merged = pd.merge_asof(
+                    df1.sort_values("Distance"),
+                    df2.sort_values("Distance"),
+                    on="Distance",
+                    direction="nearest",
+                    tolerance=1  # small tolerance to avoid misalignments
+                )
 
-                st.pyplot(fig)
+                merged = merged.dropna()
+
+                # Set Distance as index for st.line_chart
+                merged = merged.set_index("Distance")
+
+                # Show using Streamlit line_chart
+                st.line_chart(merged)
 
     except Exception as e:
         st.error(f"Failed to load session: {e}")
