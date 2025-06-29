@@ -9,7 +9,7 @@ if "sessions" not in st.session_state:
     st.session_state.sessions = {}
 
 if "teams" not in st.session_state:
-    st.session_state.teams = {}
+    st.session_state.teams = []
 
 
 rounds = None
@@ -29,7 +29,7 @@ with picker_col2:
         selected_round = st.selectbox('Round', options=rounds)
 with picker_col3:
     if selected_round:
-        teams = st.session_state.teams[selected_round]
+        teams = st.session_state.teams
         team = st.selectbox('Session Team', teams)
 with picker_col4:
     st.markdown('')
