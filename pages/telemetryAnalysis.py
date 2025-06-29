@@ -6,10 +6,11 @@ import matplotlib.colors as mcolors
 from src.data_ingestion.openf1_loader import *
 from src.utils.plot_utils import TEAM_COLORS
 
-# def interpolate_telemetry(tel, common_distance):
-#     tel_interp = tel.set_index('Distance').reindex(common_distance).interpolate(method='index').reset_index()
-#     tel_interp.rename(columns={'index': 'Distance'}, inplace=True)
-#     return tel_interp
+
+# TO ADD
+# BEST LAPTIME FOR EACH DRIVER
+# SECTOR TIMES
+# TOP SPEED MAYBE?
 
 def adjust_color_brightness(hex_color, factor=0.8):
     """
