@@ -83,11 +83,53 @@ if load_data:
                 st.pyplot(fig)
 
 
+            # Throttle plot
             fig, ax = plt.subplots(figsize=(10, 6))
             ax.plot(tel_driver1['Distance'], tel_driver1['Throttle'], label=driver1)
             ax.plot(tel_driver2['Distance'], tel_driver2['Throttle'], label=driver2)
             ax.set_xlabel("Distance (m)")
             ax.set_ylabel("Throttle (%)")
+            ax.legend()
+            ax.grid(True)
+            st.pyplot(fig)
+
+
+            # Braking plot
+            fig, ax = plt.subplots(figsize=(10, 6))
+            ax.plot(tel_driver1['Distance'], tel_driver1['Brake'], label=driver1)
+            ax.plot(tel_driver2['Distance'], tel_driver2['Brake'], label=driver2)
+            ax.set_xlabel("Distance (m)")
+            ax.set_ylabel("Brake (boolean)")
+            ax.legend()
+            ax.grid(True)
+            st.pyplot(fig)
+
+            # Gear plot
+            fig, ax = plt.subplots(figsize=(10, 6))
+            ax.plot(tel_driver1['Distance'], tel_driver1['nGear'], label=driver1)
+            ax.plot(tel_driver2['Distance'], tel_driver2['nGear'], label=driver2)
+            ax.set_xlabel("Distance (m)")
+            ax.set_ylabel("Gear")
+            ax.legend()
+            ax.grid(True)
+            st.pyplot(fig)
+
+            # RPM plot
+            fig, ax = plt.subplots(figsize=(10, 6))
+            ax.plot(tel_driver1['Distance'], tel_driver1['RPM'], label=driver1)
+            ax.plot(tel_driver2['Distance'], tel_driver2['RPM'], label=driver2)
+            ax.set_xlabel("Distance (m)")
+            ax.set_ylabel("RPM")
+            ax.legend()
+            ax.grid(True)
+            st.pyplot(fig)
+
+            # Steering angle?
+            fig, ax = plt.subplots(figsize=(10, 6))
+            ax.plot(tel_driver1['Distance'], tel_driver1['Steer'], label=driver1)
+            ax.plot(tel_driver2['Distance'], tel_driver2['Steer'], label=driver2)
+            ax.set_xlabel("Distance (m)")
+            ax.set_ylabel("Steering Angle (degrees)")
             ax.legend()
             ax.grid(True)
             st.pyplot(fig)
