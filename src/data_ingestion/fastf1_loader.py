@@ -2,8 +2,9 @@
 import fastf1
 import pandas as pd
 import time
-
 from datetime import timedelta, datetime
+
+fastf1.logger.set_log_level('ERROR')
 
 DNF_STATUSES = ['Collision damage', 'Hydraulics', 'Radiator', 'Collision', 'Retired', 'Did not start', 'Mechanical', 'Electronics']
 FINISHED_STATUSES = ['+2 Laps', 'Lapped', 'Finished', '+1 Lap']
@@ -287,7 +288,7 @@ def get_driver_full_info(driver:str = None, starting_season:int = 2018, last_sea
 
             # Skip events in which the driver was not part of the race
             if driver_result.empty:
-                print('Driver did not participate in this event!')
+                print(f'Driver did not participate in this event! - {event['EventName']} - {year}')
                 continue
 
             # Process general race stats
@@ -334,7 +335,7 @@ def get_driver_full_info(driver:str = None, starting_season:int = 2018, last_sea
             # Get the result of the teammate
             teammate_race_result = race_results.loc[(race_results['TeamId'] == team_id) & (race_results['FullName'] != driver)]
             if teammate_race_result.empty:
-                print('Teammate did not participate in the race')
+                print(f'Teammate did not participate in the race - {event['EventName']} - {year}')
                 continue
             teammate_race_result = teammate_race_result.iloc[0]
 
@@ -353,14 +354,14 @@ def get_driver_full_info(driver:str = None, starting_season:int = 2018, last_sea
             # Get driver quali result
             driver_quali_result = quali_results.loc[quali_results['FullName'] == driver]
             if driver_quali_result.empty:
-                print('Driver did not participate in this Quali, but raced')
+                print(f'Driver did not participate in this Quali, but raced - {event['EventName']} - {year}')
                 continue
             driver_quali_result = driver_quali_result.iloc[0]
 
             # Get teammate quali result
             teammate_quali_result = quali_results.loc[(quali_results['TeamId'] == team_id) & (quali_results['FullName'] != driver)]
             if teammate_quali_result.empty:
-                print('Teammate did not participate in this Quali, but raced')
+                print(f'Teammate did not participate in this Quali, but raced - {event['EventName']} - {year}')
                 continue
             teammate_quali_result = teammate_quali_result.iloc[0]
 
