@@ -86,7 +86,7 @@ if load_data:
                 # --- Plot example: Speed vs Distance ---
                 fig, ax = plt.subplots(figsize=(10, 6))
                 ax.plot(tel_driver1['Distance'], tel_driver1['Speed'], label=driver1, color=team_color)
-                ax.plot(tel_driver2['Distance'], tel_driver2['Speed'], label=driver2, color=darker_color)
+                ax.plot(tel_driver2['Distance'], tel_driver2['Speed'], label=driver2, color=darker_color, alpha=0.7)
 
                 ax.set_xlabel("Distance (m)")
                 ax.set_ylabel("Speed (km/h)")
