@@ -1,70 +1,86 @@
 import streamlit as st
 import fastf1
-from fastf1 import plotting
 import pandas as pd
 import matplotlib.pyplot as plt
+from fastf1 import plotting
 
 plotting.setup_mpl()
 
-st.title("Telemetry Comparison Between Teammates")
+st.title("Teammate Telemetry Comparison (Qualifying)")
 
 # --- Sidebar selectors ---
-st.sidebar.header("Telemetry Comparison Settings")
+st.sidebar.header("Telemetry Settings")
 
-season = st.sidebar.selectbox("Season", options=list(range(2018, 2024)), index=5)
-session_type = st.sidebar.selectbox("Session", options=["Q", "R", "FP1", "FP2", "FP3"], index=0)
-gp_name = st.sidebar.text_input("Grand Prix Name (e.g., 'Monza')")
-team = st.sidebar.text_input("Team Name (e.g., 'Mercedes')")
+seasons = list(range(2018, 2024))
+selected_season = st.sidebar.selectbox("Select Season", options=seasons, index=len(seasons)-1)
 
-load_button = st.sidebar.button("Load and Show Telemetry")
+# --- Get events for selected season ---
+@st.cache_data(show_spinner="Loading races...")
+def get_race_events(season):
+    schedule = fastf1.get_event_schedule(season)
+    return schedule[['EventName', 'EventDate']]
 
-# --- Helper function ---
-@st.cache_data(show_spinner="Loading session data, please wait...")
-def load_session_data(year, gp_name, session_type):
-    event = fastf1.get_event(year, gp_name)
-    session = event.get_session(session_type)
-    session.load(laps=True, telemetry=True, weather=False, messages=False, livedata=False)
-    return session
+events_df = get_race_events(selected_season)
+race_names = events_df['EventName'].tolist()
 
-if load_button and gp_name and team:
+selected_race = st.sidebar.selectbox("Select Race", options=race_names)
+
+# --- Load qualifying session and get teams ---
+@st.cache_data(show_spinner="Loading qualifying data...")
+def get_teams_for_race(season, race_name):
     try:
-        # Load session
-        session = load_session_data(season, gp_name, session_type)
+        event = fastf1.get_event(season, race_name)
+        quali = event.get_session('Q')
+        quali.load(laps=True, telemetry=False, weather=False, messages=False, livedata=False)
+        teams = quali.laps['Team'].dropna().unique().tolist()
+        return teams
+    except Exception as e:
+        return []
 
-        # Get laps data
-        laps = session.laps
-        if laps.empty:
-            st.error("No lap data found for this session.")
+if selected_race:
+    available_teams = get_teams_for_race(selected_season, selected_race)
+    if available_teams:
+        selected_team = st.sidebar.selectbox("Select Team", options=available_teams)
+    else:
+        selected_team = None
+else:
+    selected_team = None
+
+# --- Load telemetry and plot ---
+if st.sidebar.button("Load and Show Telemetry") and selected_team:
+    try:
+        event = fastf1.get_event(selected_season, selected_race)
+        quali = event.get_session('Q')
+        quali.load(laps=True, telemetry=True, weather=False, messages=False, livedata=False)
+
+        laps = quali.laps
+        team_laps = laps[laps['Team'] == selected_team]
+
+        drivers = team_laps['Driver'].unique()
+        if len(drivers) < 2:
+            st.error(f"Team {selected_team} has fewer than 2 drivers in this session.")
         else:
-            # Find team drivers
-            team_drivers = laps[laps['Team'] == team]['Driver'].unique()
-            if len(team_drivers) < 2:
-                st.error(f"Not enough drivers for team '{team}' in this session.")
+            driver1, driver2 = drivers[0], drivers[1]
+
+            lap1 = team_laps.pick_driver(driver1).pick_fastest()
+            lap2 = team_laps.pick_driver(driver2).pick_fastest()
+
+            if lap1 is None or lap2 is None:
+                st.error("Could not find fastest laps for both drivers.")
             else:
-                driver1, driver2 = team_drivers[0], team_drivers[1]
+                tel1 = lap1.get_car_data().add_distance()
+                tel2 = lap2.get_car_data().add_distance()
 
-                # Get fastest lap for each driver
-                lap1 = laps.pick_driver(driver1).pick_fastest()
-                lap2 = laps.pick_driver(driver2).pick_fastest()
+                fig, ax = plt.subplots(figsize=(10, 5))
+                ax.plot(tel1['Distance'], tel1['Speed'], label=f"{driver1} fastest lap")
+                ax.plot(tel2['Distance'], tel2['Speed'], label=f"{driver2} fastest lap")
+                ax.set_xlabel("Distance (m)")
+                ax.set_ylabel("Speed (km/h)")
+                ax.set_title(f"Qualifying Speed Comparison: {driver1} vs {driver2}")
+                ax.legend()
+                st.pyplot(fig)
 
-                if lap1 is None or lap2 is None:
-                    st.error("One or both drivers have no valid fastest lap data.")
-                else:
-                    tel1 = lap1.get_car_data().add_distance()
-                    tel2 = lap2.get_car_data().add_distance()
-
-                    # Plot
-                    fig, ax = plt.subplots(figsize=(10, 5))
-                    ax.plot(tel1['Distance'], tel1['Speed'], label=f"{driver1} fastest lap")
-                    ax.plot(tel2['Distance'], tel2['Speed'], label=f"{driver2} fastest lap")
-                    ax.set_xlabel("Distance (m)")
-                    ax.set_ylabel("Speed (km/h)")
-                    ax.set_title(f"Speed Comparison: {driver1} vs {driver2}")
-                    ax.legend()
-                    st.pyplot(fig)
-
-                    # Optionally show driver names
-                    st.write(f"Drivers compared: **{driver1}** and **{driver2}**")
+                st.write(f"Drivers compared: **{driver1}** and **{driver2}**")
 
     except Exception as e:
-        st.error(f"Error loading or processing data: {e}")
+        st.error(f"Error: {e}")
