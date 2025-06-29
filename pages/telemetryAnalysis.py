@@ -1,14 +1,24 @@
 import streamlit as st
 import fastf1
 import matplotlib.pyplot as plt
-import pandas as pd
+import matplotlib.colors as mcolors
 
 from src.data_ingestion.openf1_loader import *
+from src.utils.plot_utils import TEAM_COLORS
 
-def interpolate_telemetry(tel, common_distance):
-    tel_interp = tel.set_index('Distance').reindex(common_distance).interpolate(method='index').reset_index()
-    tel_interp.rename(columns={'index': 'Distance'}, inplace=True)
-    return tel_interp
+# def interpolate_telemetry(tel, common_distance):
+#     tel_interp = tel.set_index('Distance').reindex(common_distance).interpolate(method='index').reset_index()
+#     tel_interp.rename(columns={'index': 'Distance'}, inplace=True)
+#     return tel_interp
+
+def adjust_color_brightness(hex_color, factor=0.8):
+    """
+    Darken or lighten a color.
+    factor < 1 → darker, factor > 1 → lighter.
+    """
+    rgb = mcolors.to_rgb(hex_color)
+    adjusted_rgb = tuple(min(max(c * factor, 0), 1) for c in rgb)
+    return adjusted_rgb
 
 if "season" not in st.session_state:
     st.session_state.season = 2023
@@ -57,6 +67,8 @@ if load_data:
             st.error(f"Expected 2 drivers for {team}, but found {len(drivers)}. Check if both participated in quali.")
         else:
             driver1, driver2 = drivers
+            team_color = TEAM_COLORS[team]
+            darker_color = adjust_color_brightness(team_color, factor=0.7)
 
             # Pick laps
             laps_driver1 = quali_session.laps.pick_driver(driver1).pick_quicklaps()
@@ -72,25 +84,16 @@ if load_data:
                 tel_driver2 = fastest_lap_driver2.get_car_data().add_distance()
 
                 # --- Plot example: Speed vs Distance ---
-                # Create a DataFrame to combine data
-                df1 = pd.DataFrame({
-                    'Distance': tel_driver1['Distance'],
-                    f'Speed_{driver1}': tel_driver1['Speed']
-                })
+                fig, ax = plt.subplots(figsize=(10, 6))
+                ax.plot(tel_driver1['Distance'], tel_driver1['Speed'], label=driver1, color=team_color)
+                ax.plot(tel_driver2['Distance'], tel_driver2['Speed'], label=driver2, color=darker_color)
 
-                df2 = pd.DataFrame({
-                    'Distance': tel_driver2['Distance'],
-                    f'Speed_{driver2}': tel_driver2['Speed']
-                })
+                ax.set_xlabel("Distance (m)")
+                ax.set_ylabel("Speed (km/h)")
+                ax.legend()
+                ax.grid(True)
 
-                # Merge on Distance
-                df = pd.merge(df1, df2, on='Distance', how='inner')
-
-                # Set Distance as index so Streamlit treats it as X axis
-                df = df.set_index('Distance')
-
-                # Plot
-                st.line_chart(df)
+                st.pyplot(fig)
 
 
             # Throttle plot
