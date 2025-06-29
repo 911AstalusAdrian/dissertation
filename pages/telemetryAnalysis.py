@@ -1,6 +1,7 @@
 import streamlit as st
 import fastf1
 import matplotlib.pyplot as plt
+import pandas as pd
 
 from src.data_ingestion.openf1_loader import *
 
@@ -71,16 +72,25 @@ if load_data:
                 tel_driver2 = fastest_lap_driver2.get_car_data().add_distance()
 
                 # --- Plot example: Speed vs Distance ---
-                fig, ax = plt.subplots(figsize=(10, 6))
-                ax.plot(tel_driver1['Distance'], tel_driver1['Speed'], label=driver1)
-                ax.plot(tel_driver2['Distance'], tel_driver2['Speed'], label=driver2)
+                # Create a DataFrame to combine data
+                df1 = pd.DataFrame({
+                    'Distance': tel_driver1['Distance'],
+                    f'Speed_{driver1}': tel_driver1['Speed']
+                })
 
-                ax.set_xlabel("Distance (m)")
-                ax.set_ylabel("Speed (km/h)")
-                ax.legend()
-                ax.grid(True)
+                df2 = pd.DataFrame({
+                    'Distance': tel_driver2['Distance'],
+                    f'Speed_{driver2}': tel_driver2['Speed']
+                })
 
-                st.pyplot(fig)
+                # Merge on Distance
+                df = pd.merge(df1, df2, on='Distance', how='inner')
+
+                # Set Distance as index so Streamlit treats it as X axis
+                df = df.set_index('Distance')
+
+                # Plot
+                st.line_chart(df)
 
 
             # Throttle plot
@@ -120,16 +130,6 @@ if load_data:
             ax.plot(tel_driver2['Distance'], tel_driver2['RPM'], label=driver2)
             ax.set_xlabel("Distance (m)")
             ax.set_ylabel("RPM")
-            ax.legend()
-            ax.grid(True)
-            st.pyplot(fig)
-
-            # Steering angle?
-            fig, ax = plt.subplots(figsize=(10, 6))
-            ax.plot(tel_driver1['Distance'], tel_driver1['Steer'], label=driver1)
-            ax.plot(tel_driver2['Distance'], tel_driver2['Steer'], label=driver2)
-            ax.set_xlabel("Distance (m)")
-            ax.set_ylabel("Steering Angle (degrees)")
             ax.legend()
             ax.grid(True)
             st.pyplot(fig)
