@@ -46,112 +46,42 @@ with picker_col4:
 
 if load_data:
     try:
-        quali = fastf1.get_session(season, selected_round, 'Q')
-        quali.load()
+        quali_session = fastf1.get_session(season, selected_round, 'Q')
+        quali_session.load()
 
-        # Get drivers from the selected team
-        team_drivers_df = quali.results[quali.results['TeamName'] == team]
+        # Get drivers for selected team
+        team_drivers_df = quali_session.results[quali_session.results['TeamName'] == team]
         drivers = team_drivers_df['Abbreviation'].values
 
         if len(drivers) != 2:
-            st.error(f"Expected 2 drivers for {team}, but found {len(drivers)}.")
+            st.error(f"Expected 2 drivers for {team}, but found {len(drivers)}. Check if both participated in quali.")
         else:
             driver1, driver2 = drivers
 
-            laps1 = quali.laps.pick_driver(driver1).pick_quicklaps()
-            laps2 = quali.laps.pick_driver(driver2).pick_quicklaps()
+            # Pick laps
+            laps_driver1 = quali_session.laps.pick_driver(driver1).pick_quicklaps()
+            laps_driver2 = quali_session.laps.pick_driver(driver2).pick_quicklaps()
 
-            if laps1.empty or laps2.empty:
-                st.error("One or both drivers have no valid quicklaps.")
+            if laps_driver1.empty or laps_driver2.empty:
+                st.error(f"One or both drivers have no valid quicklaps in quali.")
             else:
-                fastest_lap1 = laps1.pick_fastest()
-                fastest_lap2 = laps2.pick_fastest()
+                fastest_lap_driver1 = laps_driver1.pick_fastest()
+                fastest_lap_driver2 = laps_driver2.pick_fastest()
 
-                tel1 = fastest_lap1.get_car_data().add_distance()
-                tel2 = fastest_lap2.get_car_data().add_distance()
+                tel_driver1 = fastest_lap_driver1.get_car_data().add_distance()
+                tel_driver2 = fastest_lap_driver2.get_car_data().add_distance()
 
-                df1 = pd.DataFrame({
-                    "Distance": tel1["Distance"],
-                    "Speed": tel1["Speed"],
-                    "Throttle": tel1["Throttle"],
-                    "Brake": tel1["Brake"]
-                })
+                # --- Plot example: Speed vs Distance ---
+                fig, ax = plt.subplots(figsize=(10, 6))
+                ax.plot(tel_driver1['Distance'], tel_driver1['Speed'], label=driver1)
+                ax.plot(tel_driver2['Distance'], tel_driver2['Speed'], label=driver2)
 
-                df2 = pd.DataFrame({
-                    "Distance": tel2["Distance"],
-                    "Speed": tel2["Speed"],
-                    "Throttle": tel2["Throttle"],
-                    "Brake": tel2["Brake"]
-                })
+                ax.set_xlabel("Distance (m)")
+                ax.set_ylabel("Speed (km/h)")
+                ax.legend()
+                ax.grid(True)
 
-                # Merge
-                merged = pd.merge_asof(
-                    df1.sort_values("Distance"),
-                    df2.sort_values("Distance"),
-                    on="Distance",
-                    direction="nearest",
-                    suffixes=(f"_{driver1}", f"_{driver2}"),
-                    tolerance=1
-                ).dropna()
-
-                # Create Plotly figure
-                fig = go.Figure()
-
-                # Speed
-                fig.add_trace(go.Scatter(
-                    x=merged["Distance"],
-                    y=merged[f"Speed_{driver1}"],
-                    name=f"{driver1} Speed",
-                    line=dict(color='red')
-                ))
-
-                fig.add_trace(go.Scatter(
-                    x=merged["Distance"],
-                    y=merged[f"Speed_{driver2}"],
-                    name=f"{driver2} Speed",
-                    line=dict(color='blue')
-                ))
-
-                # Throttle
-                fig.add_trace(go.Scatter(
-                    x=merged["Distance"],
-                    y=merged[f"Throttle_{driver1}"],
-                    name=f"{driver1} Throttle",
-                    line=dict(color='red', dash='dot')
-                ))
-
-                fig.add_trace(go.Scatter(
-                    x=merged["Distance"],
-                    y=merged[f"Throttle_{driver2}"],
-                    name=f"{driver2} Throttle",
-                    line=dict(color='blue', dash='dot')
-                ))
-
-                # Brake
-                fig.add_trace(go.Scatter(
-                    x=merged["Distance"],
-                    y=merged[f"Brake_{driver1}"],
-                    name=f"{driver1} Brake",
-                    line=dict(color='red', dash='dash')
-                ))
-
-                fig.add_trace(go.Scatter(
-                    x=merged["Distance"],
-                    y=merged[f"Brake_{driver2}"],
-                    name=f"{driver2} Brake",
-                    line=dict(color='blue', dash='dash')
-                ))
-
-                fig.update_layout(
-                    title=f"Qualifying Telemetry Comparison - {team} ({season}, Round {selected_round})",
-                    xaxis_title='Distance (m)',
-                    yaxis_title='Metric Value',
-                    hovermode="x unified",
-                    template="plotly_dark",
-                    height=700
-                )
-
-                st.plotly_chart(fig, use_container_width=True)
+                st.pyplot(fig)
 
     except Exception as e:
-        st.error(f"Failed to load or plot telemetry: {e}")
+        st.error(f"Failed to load session: {e}")
