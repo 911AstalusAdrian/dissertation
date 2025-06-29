@@ -1,93 +1,90 @@
-import streamlit as st
 import fastf1
-import fastf1.plotting
+from fastf1 import plotting
 import pandas as pd
+import numpy as np
+import streamlit as st
 import plotly.express as px
 
-# fastf1.Cache.enable_cache('./cache')  # Important if not done yet
+plotting.setup_mpl()
 
-@st.cache_data(show_spinner="Loading session data...")
-def load_session(season, race_name, session_type):
-    session = fastf1.get_session(season, race_name, session_type)
+@st.cache_data
+def get_event_schedule(season):
+    return fastf1.get_event_schedule(season)
+
+@st.cache_data
+def load_session(year, gp_name, session_type):
+    event = fastf1.get_event(year, gp_name)
+    session = event.get_session(session_type)
     session.load()
     return session
 
-st.header("Teammate Telemetry & Delta Comparison")
+def interpolate_telemetry(tel, common_distance):
+    tel_interp = tel.set_index('Distance').reindex(common_distance).interpolate(method='index').reset_index()
+    tel_interp.rename(columns={'index': 'Distance'}, inplace=True)
+    return tel_interp
 
-# --- Sidebar selections ---
-season = st.sidebar.selectbox("Select Season", list(range(2018, 2025)))
-session_type = 'Q'
+# --- Streamlit UI ---
+st.title("Teammate Telemetry Comparison")
 
-schedule = fastf1.get_event_schedule(season)
-race_name = st.sidebar.selectbox("Select Race", schedule['EventName'].tolist())
+season = st.selectbox("Select Season", list(range(2018, 2025)))
+event_schedule = get_event_schedule(season)
+races = event_schedule['EventName'].tolist()
+race = st.selectbox("Select Race", races)
 
-if st.sidebar.button("Compare Teammates"):
-    session = load_session(season, race_name, session_type)
-    race_results = session.results
+session_type = st.selectbox("Session Type", ['Qualifying', 'Race'])
 
-    teams = race_results['TeamName'].unique()
-    team_name = st.selectbox("Select Team", teams)
+if st.button("Load Session and Show Teammates"):
+    session = load_session(season, race, session_type)
+    drivers = session.results['FullName'].unique().tolist()
+    team_options = session.results['TeamName'].unique().tolist()
 
-    team_drivers = race_results.loc[race_results['TeamName'] == team_name]['Abbreviation'].values
+    team = st.selectbox("Select Team", team_options)
+
+    team_drivers = session.results.loc[session.results['TeamName'] == team, 'FullName'].tolist()
 
     if len(team_drivers) < 2:
-        st.warning("This team had fewer than 2 drivers in this session.")
+        st.warning("This team has less than two drivers in this session.")
     else:
-        # Get fastest laps
-        laps_driver1 = session.laps.pick_driver(team_drivers[0]).pick_fastest()
-        laps_driver2 = session.laps.pick_driver(team_drivers[1]).pick_fastest()
+        driver1 = team_drivers[0]
+        driver2 = team_drivers[1]
 
-        tel1 = laps_driver1.get_car_data().add_distance()
-        tel2 = laps_driver2.get_car_data().add_distance()
+        # Get laps
+        laps_driver1 = session.laps.pick_driver(driver1).pick_fastest()
+        laps_driver2 = session.laps.pick_driver(driver2).pick_fastest()
 
-        # --- Speed plot ---
-        fig = px.line(x=tel1['Distance'], y=tel1['Speed'], labels={'x': 'Distance (m)', 'y': 'Speed (km/h)'},
-                      title=f"Speed Comparison: {team_drivers[0]} vs {team_drivers[1]}")
-        fig.add_scatter(x=tel2['Distance'], y=tel2['Speed'], name=team_drivers[1])
-        fig.update_traces(name=team_drivers[0], selector=dict(type='scatter', mode='lines'))
-        st.plotly_chart(fig)
+        tel1 = laps_driver1.get_telemetry().add_distance()
+        tel2 = laps_driver2.get_telemetry().add_distance()
 
-        # --- Delta plot ---
-        delta_time = fastf1.utils.delta_time(laps_driver1, laps_driver2)
-        fig_delta = px.line(x=tel1['Distance'], y=delta_time,
-                            labels={'x': 'Distance (m)', 'y': 'Delta Time (s)'},
-                            title=f"Delta Time Along Lap: {team_drivers[0]} vs {team_drivers[1]}")
-        st.plotly_chart(fig_delta)
+        # Common distance range
+        min_distance = max(tel1['Distance'].min(), tel2['Distance'].min())
+        max_distance = min(tel1['Distance'].max(), tel2['Distance'].max())
+        common_distance = np.linspace(min_distance, max_distance, num=500)
 
-        # --- Optional: Throttle ---
-        if st.checkbox("Show throttle comparison"):
-            fig_throttle = px.line(x=tel1['Distance'], y=tel1['Throttle'], labels={'x': 'Distance (m)', 'y': 'Throttle (%)'},
-                                   title="Throttle Comparison")
-            fig_throttle.add_scatter(x=tel2['Distance'], y=tel2['Throttle'], name=team_drivers[1])
-            fig_throttle.update_traces(name=team_drivers[0], selector=dict(type='scatter', mode='lines'))
-            st.plotly_chart(fig_throttle)
+        # Interpolate
+        tel1_interp = interpolate_telemetry(tel1, common_distance)
+        tel2_interp = interpolate_telemetry(tel2, common_distance)
 
-        # --- Optional: Brake ---
-        if st.checkbox("Show brake comparison"):
-            fig_brake = px.line(x=tel1['Distance'], y=tel1['Brake'], labels={'x': 'Distance (m)', 'y': 'Brake (%)'},
-                                title="Brake Comparison")
-            fig_brake.add_scatter(x=tel2['Distance'], y=tel2['Brake'], name=team_drivers[1])
-            fig_brake.update_traces(name=team_drivers[0], selector=dict(type='scatter', mode='lines'))
-            st.plotly_chart(fig_brake)
+        # Plot Speed
+        fig_speed = px.line(x=tel1_interp['Distance'], y=tel1_interp['Speed'],
+                            labels={'x': 'Distance (m)', 'y': 'Speed (km/h)'},
+                            title=f"Speed Comparison: {driver1} vs {driver2}")
+        fig_speed.add_scatter(x=tel2_interp['Distance'], y=tel2_interp['Speed'], name=driver2)
+        st.plotly_chart(fig_speed)
 
-        # --- Sector summary ---
-        sectors = ['Sector1Time', 'Sector2Time', 'Sector3Time']
+        # Plot Throttle
+        fig_throttle = px.line(x=tel1_interp['Distance'], y=tel1_interp['Throttle'],
+                               labels={'x': 'Distance (m)', 'y': 'Throttle (%)'},
+                               title="Throttle Comparison")
+        fig_throttle.add_scatter(x=tel2_interp['Distance'], y=tel2_interp['Throttle'], name=driver2)
+        st.plotly_chart(fig_throttle)
 
-        try:
-            sector_times1 = [laps_driver1[sec].total_seconds() for sec in sectors]
-            sector_times2 = [laps_driver2[sec].total_seconds() for sec in sectors]
+        # Plot Brake
+        fig_brake = px.line(x=tel1_interp['Distance'], y=tel1_interp['Brake'],
+                            labels={'x': 'Distance (m)', 'y': 'Brake (%)'},
+                            title="Brake Comparison")
+        fig_brake.add_scatter(x=tel2_interp['Distance'], y=tel2_interp['Brake'], name=driver2)
+        st.plotly_chart(fig_brake)
 
-            df_sector = pd.DataFrame({
-                'Sector': ['Sector 1', 'Sector 2', 'Sector 3'],
-                team_drivers[0]: sector_times1,
-                team_drivers[1]: sector_times2,
-                'Delta (s)': [s1 - s2 for s1, s2 in zip(sector_times1, sector_times2)]
-            })
-            st.subheader("Sector Time Summary")
-            st.dataframe(df_sector.style.format({
-                team_drivers[0]: "{:.3f}",
-                team_drivers[1]: "{:.3f}",
-                'Delta (s)': "{:+.3f}"
-            }))
-        except Exception as e:
-            st.warning(f"Could not extract sector data: {e}")
+        # Optional: plot Gear, RPM, Delta, etc.
+
+        st.success("Telemetry comparison plots generated successfully! 🚀")
