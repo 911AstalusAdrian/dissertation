@@ -1,6 +1,6 @@
 import streamlit as st
 
-from src.data_ingestion.openf1_loader import get_races_per_season
+from src.data_ingestion.openf1_loader import get_races_per_season, get_teams_for_season
 
 if "season" not in st.session_state:
     st.session_state.season = 2023
@@ -22,6 +22,7 @@ with picker_col1:
     season = st.selectbox('Choose Season', options=[2023,2024,2025])
     st.session_state.season = season
     st.session_state.sessions = get_races_per_season(season=season)
+    st.session_state.teams = get_teams_for_season(season=season)
     rounds = list(st.session_state.sessions.keys())
 with picker_col2:
     if st.session_state.season:

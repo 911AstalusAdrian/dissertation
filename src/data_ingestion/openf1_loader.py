@@ -201,3 +201,11 @@ def get_teams_for_driver(driver_name=None):
     unique_teams = driver_rows.drop_duplicates(subset='team_name')
 
     return unique_teams['team_name'].to_list()
+
+
+def get_teams_for_season(season:int=2023):
+    params = {'year': season}
+    sessions = fetch_static_data('sessions', params)
+    first_session_key = sessions.loc[0].session_key
+    drivers = get_distinct_drivers(session_key=first_session_key)
+    return set(drivers['team_name'])
