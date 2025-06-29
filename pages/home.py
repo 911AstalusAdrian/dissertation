@@ -5,7 +5,7 @@ import plotly.express as px
 from datetime import timedelta
 from src.data_ingestion.openf1_loader import *
 from src.data_ingestion.fastf1_loader import get_kpis_from_session, get_session_top5_drivers_laps, get_session_tyre_distribution
-from src.utils.df_utils import format_laptime
+from src.utils.other_utils import format_laptime
 
 ### Driver-related methods
 def load_driver_data():
