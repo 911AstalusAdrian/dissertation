@@ -677,3 +677,7 @@ def get_driver_synergy_per_race(drivername:str=None, starting_season:int=2020, f
                     stats['Synergy'] = synergy
                     driver_synergies.append(stats)
     return driver_synergies
+
+
+
+print(get_driver_full_info('Charles Leclerc'))
