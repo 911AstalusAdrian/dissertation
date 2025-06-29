@@ -4,7 +4,7 @@ import fastf1.plotting
 import pandas as pd
 import plotly.express as px
 
-fastf1.Cache.enable_cache('./cache')  # Important if not done yet
+# fastf1.Cache.enable_cache('./cache')  # Important if not done yet
 
 @st.cache_data(show_spinner="Loading session data...")
 def load_session(season, race_name, session_type):
