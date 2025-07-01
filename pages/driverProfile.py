@@ -24,7 +24,10 @@ def get_drivers_data():
 
 @st.cache_data
 def get_driver_photo(driver_name):
-    return get_driver_image(driver_name)
+    try:
+        return get_driver_image(driver_name)
+    except Exception as e:
+        return None
 
 # @st.cache_data
 # def get_driver_comparisons(driver_name):
