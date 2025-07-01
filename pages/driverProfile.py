@@ -208,7 +208,9 @@ if show_driver_button:
 
     profile_col1, profile_col2 = st.columns([1,3])
     with profile_col1:
-        st.image(get_driver_photo(driver), width=150)
+        photo = get_driver_photo(driver)
+        if photo is not None:
+            st.image(get_driver_photo(driver), width=150)
     with profile_col2:
         kpi_cols = st.columns(3)
         kpi_cols[0].metric('Total Races', driver_data['TotalRaces'])
